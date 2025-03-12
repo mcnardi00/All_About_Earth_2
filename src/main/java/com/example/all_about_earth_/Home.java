@@ -17,6 +17,7 @@ import javafx.scene.input.PickResult;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
@@ -33,12 +34,19 @@ public class Home extends Application {
     private final Button pointer = new Button();  //Bottone a scelta
     private final Button sidebarButton = new Button();
 
+    private Button settings;
+    private Button audio;
+
+    private HBox buttonBox;
+
     //Pane che contiene tutto ( va inserito nello stack pane)
     private final BorderPane borderPane = new BorderPane();
 
+    //Dimensioni schermo
     private static final float WIDTH = 1400;
     private static final float HEIGHT = 1000;
 
+    //Servono per la rotazione della sfera
     private double anchorX, anchorY;
     private double anchorAngleX = 0;
     private double anchorAngleY = 0;
@@ -52,87 +60,201 @@ public class Home extends Application {
 
     @Override
     public void start(Stage stage){
+
+        //Setto la camera e la sua visuale
         Camera camera = new PerspectiveCamera(true);
         camera.setNearClip(1);
         camera.setFarClip(10000);
         camera.translateZProperty().set(-1000);
 
+        //Terra
         Group world = new Group();
         world.getChildren().add(prepareEarth());
 
+        //Slider
         Slider slider = prepareSlider();
         world.translateZProperty().bind(slider.valueProperty());
 
+        //Tasto randomPointer
         Image randomImage = new Image("random.png");
         ImageView randomView = new ImageView(randomImage);
         randomView.setFitHeight(35);
         randomView.setFitWidth(35);
         randomView.setSmooth(true);
         randomView.setPreserveRatio(true);
-
         randomPointer.setMaxSize(40,40);
         randomPointer.setGraphic(randomView);
 
+        //Tasto pointer
         Image pointerImage = new Image("pointer.png");
         ImageView pointerView = new ImageView(pointerImage);
         pointerView.setFitHeight(30);
         pointerView.setFitWidth(30);
-        randomView.setSmooth(true);
-        randomView.setPreserveRatio(true);
-
+        pointerView.setSmooth(true);
+        pointerView.setPreserveRatio(true);
         pointer.setMaxSize(35,35);
         pointer.setGraphic(pointerView);
 
-        HBox buttonBox = new HBox(10, randomPointer, pointer); // 10 è il padding tra i bottoni
+        //Li inserisco nel HBox
+        buttonBox = new HBox(10, randomPointer, pointer); // 10 è il padding tra i bottoni
         buttonBox.setPadding(new Insets(0, 0, 20, 20));
         buttonBox.setLayoutX(290);
-        buttonBox.setLayoutY(210);
+        buttonBox.setLayoutY(200);
 
+        //Tasto sideBar
+        Image sidebarImage = new Image("play2.png");
+        ImageView sidebarView = new ImageView(sidebarImage);
+        sidebarView.setFitHeight(50);
+        sidebarView.setFitWidth(50);
+        sidebarView.setSmooth(true);
+        sidebarView.setPreserveRatio(true);
+        sidebarButton.setMaxSize(50,50);
+        sidebarButton.setGraphic(sidebarView);
+        //sidebarButton.setStyle("-fx-background-color: white; -fx-border-color: transparent; -fx-padding: 0;");
+
+        //Hbox della sideBar
+        HBox sidebarBox = new HBox(sidebarButton);
+        sidebarBox.setLayoutX(-440);
+        sidebarBox.setLayoutY(0);
+
+        //Fornisce lo stile ai bottoni
+        setButtonStyle();
+
+        //Inserisco tutto nei bottoni
         Group root = new Group();
         root.getChildren().add(world);
         root.getChildren().add(prepareImageView());
         root.getChildren().add(slider);
         root.getChildren().add(buttonBox);
+        root.getChildren().add(sidebarBox);
 
+        //Crea la sidebar
+        sidebarButton.setOnAction(e-> {
+            root.getChildren().add(createSidebar());
+        });
+
+        //Setto alla scena la camera
         Scene scene = new Scene(root, WIDTH, HEIGHT, true);
         scene.setFill(Color.SILVER);
         scene.setCamera(camera);
 
-        //scene.setOnMouseClicked(this::handleEarthClick);
-
+        //Gestisce il controllo del mouse e del click
         initMouseControl(world, scene, stage);
 
+        //scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setTitle("All About Places");
         stage.setScene(scene);
         stage.setFullScreen(true);
         stage.show();
 
+        //Prepara l'animazione della terra che ruota
         prepareAnimation();
     }
+
+    //Crea la sidebar e i suoi bottoni
+    public VBox createSidebar() {
+        VBox sideBox = new VBox();
+        sideBox.setSpacing(15);
+        sideBox.setPadding(new Insets(20));
+        sideBox.setAlignment(Pos.CENTER_LEFT);
+
+        settings = createSidebarButton("Impostazioni", "settingsWhite.png");
+        audio = createSidebarButton("Audio", "audio2.png");
+
+        sideBox.getChildren().addAll(settings, audio);
+        settings.setOnAction(e -> System.out.println("Impostazioni cliccate"));
+
+        sideBox.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E);" +
+                        "-fx-border-color: #ECF0F1;" +
+                        "-fx-border-width: 2px;" +
+                        "-fx-border-radius: 15px;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 10, 0, 3, 3);"
+        );
+
+        sideBox.setLayoutY(0);
+        sideBox.setLayoutX(-420);
+
+        return sideBox;
+    }
+
+
+    public void setButtonStyle(){
+        randomPointer.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E); " +
+                        "-fx-background-radius: 15; " +
+                        "-fx-border-color: #ECF0F1; " +
+                        "-fx-border-width: 1px; " +
+                        "-fx-border-radius: 15; " +
+                        "-fx-padding: 5; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 2);"
+        );
+
+        pointer.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E); " +
+                        "-fx-background-radius: 15; " +
+                        "-fx-border-color: #ECF0F1; " +
+                        "-fx-border-width: 1px; " +
+                        "-fx-border-radius: 15; " +
+                        "-fx-padding: 5; " +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 2);"
+        );
+
+        buttonBox.setStyle(
+                "-fx-background-color: rgba(255, 255, 255, 0.2); " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-padding: 10; " +
+                        "-fx-border-color: rgba(255, 255, 255, 0.5); " +
+                        "-fx-border-width: 1px; " +
+                        "-fx-border-radius: 20;"
+        );
+    }
+
 
     public Button createSidebarButton(String text, String image) {
         Image icon = new Image(image);
         ImageView iconView = new ImageView(icon);
-        iconView.setFitWidth(45);
-        iconView.setFitHeight(45);
+        iconView.setFitWidth(30);
+        iconView.setFitHeight(30);
 
         Label label = new Label(text);
         label.setTextFill(Color.web("#ECF0F1"));
-        label.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 18));
+        label.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
 
-        HBox buttonContent = new HBox(10, iconView, label); // 10 è il padding tra icona e testo
+        HBox buttonContent = new HBox(15, iconView, label);
         buttonContent.setAlignment(Pos.CENTER_LEFT);
 
         Button button = new Button();
         button.setGraphic(buttonContent);
-        button.setStyle("-fx-background-color: transparent; -fx-text-fill: #ECF0F1; -fx-padding: 10; -fx-border-radius: 10; -fx-font-size: 22;");
+        button.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-padding: 12px;" +
+                        "-fx-border-radius: 10px;" +
+                        "-fx-font-size: 18px;" +
+                        "-fx-text-fill: #ECF0F1;"
+        );
+
+        // Effetto Hover
+        button.setOnMouseEntered(e -> button.setStyle(
+                "-fx-background-color: #3E556E;" +
+                        "-fx-padding: 12px;" +
+                        "-fx-border-radius: 10px;" +
+                        "-fx-font-size: 18px;" +
+                        "-fx-text-fill: #ECF0F1;"
+        ));
+
+        button.setOnMouseExited(e -> button.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-padding: 12px;" +
+                        "-fx-border-radius: 10px;" +
+                        "-fx-font-size: 18px;" +
+                        "-fx-text-fill: #ECF0F1;"
+        ));
+
         button.setMaxWidth(Double.MAX_VALUE); // Rende i bottoni larghi quanto la sidebar
-
-        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #3E556E; -fx-text-fill: #ECF0F1; -fx-padding: 10; -fx-border-radius: 10; -fx-font-size: 22;"));
-        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: transparent; -fx-text-fill: #ECF0F1; -fx-padding: 10; -fx-border-radius: 10; -fx-font-size: 22;"));
-
         return button;
     }
+
 
     private void prepareAnimation() {
         AnimationTimer timer = new AnimationTimer() {
