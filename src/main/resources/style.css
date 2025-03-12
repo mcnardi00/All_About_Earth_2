@@ -1,0 +1,39 @@
+/* Stile per i campi di testo */
+.text-field, .password-field {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-color: #333;
+    -fx-border-width: 2px;
+    -fx-padding: 8px;
+    -fx-font-size: 14px;
+    -fx-background-color: #fff;
+    -fx-text-fill: #000;
+}
+
+/* Cambia il bordo quando il campo è in focus */
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #0078D7;
+    -fx-border-width: 2px;
+}
+
+/* Stile per i bottoni squadrati ed eleganti */
+.button {
+    -fx-background-color: #20B2AA; /* Verde acqua */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-border-color: #008B8B; /* Bordo leggermente più scuro */
+    -fx-border-width: 2px;
+    -fx-border-radius: 0px; /* Bottoni squadrati */
+    -fx-background-radius: 0px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 2, 2); /* Ombreggiatura leggera */
+}
+
+.button:hover {
+    -fx-background-color: #1E9E96; /* Verde acqua leggermente più scuro */
+}
+
+.button:pressed {
+    -fx-background-color: #17887F; /* Verde acqua ancora più scuro */
+}
