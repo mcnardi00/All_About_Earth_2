@@ -147,6 +147,14 @@ public class Home extends Application {
                 isClicked = false;
             } else {  //Se la sidebar è chiusa
                 root.getChildren().add(sideBar);
+
+                settings.setOnAction(event -> System.out.println("Impostazioni cliccate"));
+
+                audio.setOnAction(event-> {
+                    root.getChildren().remove(sideBar);
+                    //root.getChildren().add(createAudioSlider());
+                });
+
                 isClicked = true;
             }
 
@@ -185,13 +193,26 @@ public class Home extends Application {
         history = createSidebarButton("History", "history.png");
 
         sideBox.getChildren().addAll(settings, audio, history);
-        settings.setOnAction(e -> System.out.println("Impostazioni cliccate"));
         setSideButtonStyle();
-
-        sideBox.setLayoutY(-50);
+        sideBox.setLayoutY(-100);
         sideBox.setLayoutX(-380);
 
         return sideBox;
+    }
+
+    public HBox createAudioSlider(){
+        Slider audioSlider = new Slider();
+        audioSlider.setMax(10);
+        audioSlider.setMin(0);
+        audioSlider.setPrefWidth(100d);
+        audioSlider.setShowTickLabels(true);
+        audioSlider.setValue(5);
+
+        HBox sliderBox = new HBox(audioSlider);
+        sliderBox.setLayoutY(-50);
+        sliderBox.setLayoutX(-380);
+
+        return sliderBox;
     }
 
     private HBox createSearchBar() {
@@ -208,8 +229,6 @@ public class Home extends Application {
                         "-fx-text-fill: white;" +  // Testo bianco
                         "-fx-prompt-text-fill: rgba(255, 255, 255, 0.7);" // Testo del placeholder visibile
         );
-
-        searchField.setOnMouseClicked(e -> searchField.requestFocus());
 
         Image searchImage = new Image("lente.png");
         ImageView searchView = new ImageView(searchImage);
@@ -233,7 +252,7 @@ public class Home extends Application {
         searchButton.setOnAction(e -> {
             String location = searchField.getText();
             if (!location.isEmpty()) {
-                //
+                System.out.println("non è vuoto");
             }
         });
 
@@ -383,7 +402,7 @@ public class Home extends Application {
         xRotate.angleProperty().bind(angleX);
         yRotate.angleProperty().bind(angleY);
 
-        scene.setOnMousePressed(event -> {
+        sphere.setOnMousePressed(event -> {
             anchorX = event.getSceneX();
             anchorY = event.getSceneY();
             anchorAngleX = angleX.get();
@@ -392,10 +411,14 @@ public class Home extends Application {
             mousePressTime = System.currentTimeMillis(); // Registra il tempo di pressione
         });
 
-        scene.setOnMouseReleased(event -> {
+        sphere.setOnMouseReleased(event -> {
             long elapsedTime = System.currentTimeMillis() - mousePressTime;
             if (elapsedTime < 200) { // Se il click è breve, consideralo valido
-                handleEarthClick(event);
+                if(isRotating){
+                    isRotating = false;
+                }else{
+                    handleEarthClick(event);
+                }
             }
         });
 
