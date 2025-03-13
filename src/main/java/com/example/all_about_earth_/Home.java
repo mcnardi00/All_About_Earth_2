@@ -185,7 +185,6 @@ public class Home extends Application {
         return sideBox;
     }
 
-
     public void setButtonStyle(){
         randomPointer.setStyle(
                 "-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E); " +
@@ -316,7 +315,8 @@ public class Home extends Application {
         PhongMaterial earthMaterial = new PhongMaterial();
         earthMaterial.setDiffuseMap(new Image("earth-d.jpg"));
         earthMaterial.setSelfIlluminationMap(new Image("earth-l.jpg"));
-        earthMaterial.setSpecularMap(new Image("earth-s.jpg"));
+        //Todo cambiare mapppa earthMaterial.setSpecularMap(new Image("earth-s.jpg"));
+        earthMaterial.setSpecularMap(new Image("provasutti.png"));
         earthMaterial.setBumpMap(new Image("earth-n.jpg"));
 
         sphere.setRotationAxis(Rotate.Y_AXIS);
