@@ -58,6 +58,8 @@ public class Home extends Application {
 
     private final Sphere sphere = new Sphere(150);
 
+    private boolean isClicked = false;
+
     @Override
     public void start(Stage stage){
 
@@ -114,7 +116,7 @@ public class Home extends Application {
 
         //Hbox della sideBar
         HBox sidebarBox = new HBox(sidebarButton);
-        sidebarBox.setLayoutX(-440);
+        sidebarBox.setLayoutX(-430);
         sidebarBox.setLayoutY(0);
 
         //Fornisce lo stile ai bottoni
@@ -128,10 +130,22 @@ public class Home extends Application {
         root.getChildren().add(buttonBox);
         root.getChildren().add(sidebarBox);
 
+        VBox sideBar = createSidebar();
+
         //Crea la sidebar
         sidebarButton.setOnAction(e-> {
-            root.getChildren().add(createSidebar());
+            System.out.println("sideButton cliccato");
+
+            if(isClicked){  //Se la sidebar è aperta
+                root.getChildren().remove(sideBar);
+                isClicked = false;
+            }else{  //Se la sidebar è chiusa
+                root.getChildren().add(sideBar);
+                isClicked = true;
+            }
+
         });
+
 
         //Setto alla scena la camera
         Scene scene = new Scene(root, WIDTH, HEIGHT, true);
@@ -156,24 +170,17 @@ public class Home extends Application {
         VBox sideBox = new VBox();
         sideBox.setSpacing(15);
         sideBox.setPadding(new Insets(20));
-        sideBox.setAlignment(Pos.CENTER_LEFT);
+        //sideBox.setAlignment(Pos.CENTER_LEFT);
 
         settings = createSidebarButton("Impostazioni", "settingsWhite.png");
         audio = createSidebarButton("Audio", "audio2.png");
 
         sideBox.getChildren().addAll(settings, audio);
         settings.setOnAction(e -> System.out.println("Impostazioni cliccate"));
+        setSideButtonStyle();
 
-        sideBox.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E);" +
-                        "-fx-border-color: #ECF0F1;" +
-                        "-fx-border-width: 2px;" +
-                        "-fx-border-radius: 15px;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 10, 0, 3, 3);"
-        );
-
-        sideBox.setLayoutY(0);
-        sideBox.setLayoutX(-420);
+        sideBox.setLayoutY(-50);
+        sideBox.setLayoutX(-380);
 
         return sideBox;
     }
@@ -210,6 +217,22 @@ public class Home extends Application {
         );
     }
 
+    public void setSideButtonStyle(){
+        settings.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
+                "-fx-background-radius: 20; " +
+                "-fx-padding: 10; " +
+                "-fx-border-color: rgba(255, 255, 255, 0.5); " +
+                "-fx-border-width: 1px; " +
+                "-fx-border-radius: 20;");
+
+        audio.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
+                "-fx-background-radius: 20; " +
+                "-fx-padding: 10; " +
+                "-fx-border-color: rgba(255, 255, 255, 0.5); " +
+                "-fx-border-width: 1px; " +
+                "-fx-border-radius: 20;");
+    }
+
 
     public Button createSidebarButton(String text, String image) {
         Image icon = new Image(image);
@@ -234,6 +257,7 @@ public class Home extends Application {
                         "-fx-text-fill: #ECF0F1;"
         );
 
+        /*
         // Effetto Hover
         button.setOnMouseEntered(e -> button.setStyle(
                 "-fx-background-color: #3E556E;" +
@@ -250,6 +274,7 @@ public class Home extends Application {
                         "-fx-font-size: 18px;" +
                         "-fx-text-fill: #ECF0F1;"
         ));
+         */
 
         button.setMaxWidth(Double.MAX_VALUE); // Rende i bottoni larghi quanto la sidebar
         return button;
