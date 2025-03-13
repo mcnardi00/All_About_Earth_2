@@ -43,6 +43,8 @@ public class Home extends Application {
 
     private HBox buttonBox;
 
+    private TextField searchField = new TextField();
+
     //Dimensioni schermo
     private static final float WIDTH = 1400;
     private static final float HEIGHT = 1000;
@@ -61,8 +63,11 @@ public class Home extends Application {
 
     private boolean isClicked = false;
 
+    private boolean isRotating = true; // La Terra parte ruotando
+    private AnimationTimer rotationTimer;
+
     @Override
-    public void start(Stage stage){
+    public void start(Stage stage) {
 
         //Setto la camera e la sua visuale
         Camera camera = new PerspectiveCamera(true);
@@ -85,7 +90,7 @@ public class Home extends Application {
         randomView.setFitWidth(35);
         randomView.setSmooth(true);
         randomView.setPreserveRatio(true);
-        randomPointer.setMaxSize(40,40);
+        randomPointer.setMaxSize(40, 40);
         randomPointer.setGraphic(randomView);
 
         //Tasto pointer
@@ -95,7 +100,7 @@ public class Home extends Application {
         pointerView.setFitWidth(30);
         pointerView.setSmooth(true);
         pointerView.setPreserveRatio(true);
-        pointer.setMaxSize(35,35);
+        pointer.setMaxSize(35, 35);
         pointer.setGraphic(pointerView);
 
         //Li inserisco nel HBox
@@ -111,7 +116,7 @@ public class Home extends Application {
         sidebarView.setFitWidth(50);
         sidebarView.setSmooth(true);
         sidebarView.setPreserveRatio(true);
-        sidebarButton.setMaxSize(50,50);
+        sidebarButton.setMaxSize(50, 50);
         sidebarButton.setGraphic(sidebarView);
         //sidebarButton.setStyle("-fx-background-color: white; -fx-border-color: transparent; -fx-padding: 0;");
 
@@ -134,13 +139,13 @@ public class Home extends Application {
         VBox sideBar = createSidebar();
 
         //Crea la sidebar
-        sidebarButton.setOnAction(e-> {
+        sidebarButton.setOnAction(e -> {
             System.out.println("sideButton cliccato");
 
-            if(isClicked){  //Se la sidebar è aperta
+            if (isClicked) {  //Se la sidebar è aperta
                 root.getChildren().remove(sideBar);
                 isClicked = false;
-            }else{  //Se la sidebar è chiusa
+            } else {  //Se la sidebar è chiusa
                 root.getChildren().add(sideBar);
                 isClicked = true;
             }
@@ -177,7 +182,7 @@ public class Home extends Application {
 
         settings = createSidebarButton("Impostazioni", "settingsWhite.png");
         audio = createSidebarButton("Audio", "audio2.png");
-        history = createSidebarButton("History","history.png");
+        history = createSidebarButton("History", "history.png");
 
         sideBox.getChildren().addAll(settings, audio, history);
         settings.setOnAction(e -> System.out.println("Impostazioni cliccate"));
@@ -190,17 +195,21 @@ public class Home extends Application {
     }
 
     private HBox createSearchBar() {
-        TextField searchField = new TextField();
         searchField.setPromptText("Cerca una località...");
         searchField.setPrefWidth(200);
         searchField.setPrefHeight(45);
-        searchField.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
-                "-fx-background-radius: 20; " +
-                "-fx-padding: 5; " +
-                "-fx-border-color: rgba(255, 255, 255, 0.5); " +
-                "-fx-border-width: 1px; " +
-                "-fx-border-radius: 20;"
+        searchField.setStyle(
+                "-fx-background-color: rgba(255, 255, 255, 0.3);" +  // Sfondo semi-trasparente
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 5;" +
+                        "-fx-border-color: rgba(255, 255, 255, 0.5);" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 20;" +
+                        "-fx-text-fill: white;" +  // Testo bianco
+                        "-fx-prompt-text-fill: rgba(255, 255, 255, 0.7);" // Testo del placeholder visibile
         );
+
+        searchField.setOnMouseClicked(e -> searchField.requestFocus());
 
         Image searchImage = new Image("lente.png");
         ImageView searchView = new ImageView(searchImage);
@@ -210,7 +219,7 @@ public class Home extends Application {
         searchView.setPreserveRatio(true);
 
         searchButton = new Button();
-        searchButton.setMaxSize(40,40);
+        searchButton.setMaxSize(40, 40);
         searchButton.setGraphic(searchView);
         searchButton.setStyle(
                 "-fx-background-color: rgba(255, 255, 255, 0.2); " +
@@ -236,7 +245,7 @@ public class Home extends Application {
         return searchBox;
     }
 
-    public void setButtonStyle(){
+    public void setButtonStyle() {
         randomPointer.setStyle(
                 "-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E); " +
                         "-fx-background-radius: 15; " +
@@ -267,7 +276,7 @@ public class Home extends Application {
         );
     }
 
-    public void setSideButtonStyle(){
+    public void setSideButtonStyle() {
         settings.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
                 "-fx-background-radius: 20; " +
                 "-fx-padding: 10; " +
@@ -319,14 +328,17 @@ public class Home extends Application {
     }
 
     private void prepareAnimation() {
-        AnimationTimer timer = new AnimationTimer() {
+        rotationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                sphere.rotateProperty().set(sphere.getRotate() + 0.2);
+                if (isRotating) {
+                    sphere.rotateProperty().set(sphere.getRotate() + 0.2);
+                }
             }
         };
-        timer.start();
+        rotationTimer.start();
     }
+
 
     private ImageView prepareImageView() {
         Image image = new Image("galaxy.jpg");
@@ -387,15 +399,22 @@ public class Home extends Application {
             }
         });
 
-        scene.setOnMouseDragged(event -> {
+        sphere.setOnMouseDragged(event -> {
             angleX.set(anchorAngleX - (anchorY - event.getSceneY()));
             angleY.set(anchorAngleY + anchorX - event.getSceneX());
         });
 
-        stage.addEventHandler(ScrollEvent.SCROLL, event -> {
+        sphere.addEventHandler(ScrollEvent.SCROLL, event -> {
             double delta = event.getDeltaY();
-            group.translateZProperty().set(group.getTranslateZ() + delta);
+
+            // Rimuove il binding prima di modificare manualmente
+            group.translateZProperty().unbind();
+
+            // Imposta il nuovo valore di translateZ
+            group.setTranslateZ(group.getTranslateZ() + delta);
+
         });
+
     }
 
 
@@ -408,26 +427,20 @@ public class Home extends Application {
         Point3D pickPoint = pickResult.getIntersectedPoint();
         if (pickPoint == null) return;
 
-        // Normalizziamo il punto rispetto al raggio della sfera
         double normX = pickPoint.getX() / sphere.getRadius();
         double normY = pickPoint.getY() / sphere.getRadius();
         double normZ = pickPoint.getZ() / sphere.getRadius();
 
-        // **Latitudine (corretta)**
         double latitude = Math.toDegrees(Math.asin(normY));
-
-        // **Longitudine senza compensazione**
         double rawLongitude = Math.toDegrees(Math.atan2(normZ, normX));
-
-        // **Compensazione della rotazione della sfera**
-        double correctedLongitude = rawLongitude + angleY.get();  // Invertito il segno
-
-        // Mantieni la longitudine nell'intervallo [-180, 180]
+        double correctedLongitude = rawLongitude + angleY.get();
         correctedLongitude = ((correctedLongitude + 180) % 360 + 360) % 360 - 180;
 
         System.out.printf("Cliccato su Lat: %.2f, Lon: %.2f%n", latitude, correctedLongitude);
-    }
 
+        // 🔄 Alterna lo stato della rotazione al click
+        isRotating = !isRotating;
+    }
 
 
 }
