@@ -1,6 +1,7 @@
 module com.example.all_about_earth_ {
     requires javafx.controls;
     requires javafx.fxml;
+    requires com.google.gson;
 
     exports com.example.all_about_earth_;
 
