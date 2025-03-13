@@ -11,11 +11,11 @@ import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.PickResult;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -34,13 +34,14 @@ public class Home extends Application {
     private final Button pointer = new Button();  //Bottone a scelta
     private final Button sidebarButton = new Button();
 
+    private Button searchButton;
+
+    //Bottoni sideBar
     private Button settings;
     private Button audio;
+    private Button history;
 
     private HBox buttonBox;
-
-    //Pane che contiene tutto ( va inserito nello stack pane)
-    private final BorderPane borderPane = new BorderPane();
 
     //Dimensioni schermo
     private static final float WIDTH = 1400;
@@ -146,6 +147,8 @@ public class Home extends Application {
 
         });
 
+        HBox searchBar = createSearchBar();
+        root.getChildren().add(searchBar);
 
         //Setto alla scena la camera
         Scene scene = new Scene(root, WIDTH, HEIGHT, true);
@@ -174,8 +177,9 @@ public class Home extends Application {
 
         settings = createSidebarButton("Impostazioni", "settingsWhite.png");
         audio = createSidebarButton("Audio", "audio2.png");
+        history = createSidebarButton("History","history.png");
 
-        sideBox.getChildren().addAll(settings, audio);
+        sideBox.getChildren().addAll(settings, audio, history);
         settings.setOnAction(e -> System.out.println("Impostazioni cliccate"));
         setSideButtonStyle();
 
@@ -183,6 +187,53 @@ public class Home extends Application {
         sideBox.setLayoutX(-380);
 
         return sideBox;
+    }
+
+    private HBox createSearchBar() {
+        TextField searchField = new TextField();
+        searchField.setPromptText("Cerca una località...");
+        searchField.setPrefWidth(200);
+        searchField.setPrefHeight(45);
+        searchField.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
+                "-fx-background-radius: 20; " +
+                "-fx-padding: 5; " +
+                "-fx-border-color: rgba(255, 255, 255, 0.5); " +
+                "-fx-border-width: 1px; " +
+                "-fx-border-radius: 20;"
+        );
+
+        Image searchImage = new Image("lente.png");
+        ImageView searchView = new ImageView(searchImage);
+        searchView.setFitWidth(35);
+        searchView.setFitHeight(35);
+        searchView.setSmooth(true);
+        searchView.setPreserveRatio(true);
+
+        searchButton = new Button();
+        searchButton.setMaxSize(40,40);
+        searchButton.setGraphic(searchView);
+        searchButton.setStyle(
+                "-fx-background-color: rgba(255, 255, 255, 0.2); " +
+                        "-fx-background-radius: 20; " +
+                        "-fx-padding: 5; " +
+                        "-fx-border-color: rgba(255, 255, 255, 0.5); " +
+                        "-fx-border-width: 1px; " +
+                        "-fx-border-radius: 20;"
+        );
+
+        searchButton.setOnAction(e -> {
+            String location = searchField.getText();
+            if (!location.isEmpty()) {
+                //
+            }
+        });
+
+        HBox searchBox = new HBox(10, searchButton, searchField);
+        searchBox.setPadding(new Insets(10));
+        searchBox.setLayoutX(-140);
+        searchBox.setLayoutY(-270);
+
+        return searchBox;
     }
 
     public void setButtonStyle(){
@@ -230,6 +281,13 @@ public class Home extends Application {
                 "-fx-border-color: rgba(255, 255, 255, 0.5); " +
                 "-fx-border-width: 1px; " +
                 "-fx-border-radius: 20;");
+
+        history.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
+                "-fx-background-radius: 20; " +
+                "-fx-padding: 10; " +
+                "-fx-border-color: rgba(255, 255, 255, 0.5); " +
+                "-fx-border-width: 1px; " +
+                "-fx-border-radius: 20;");
     }
 
 
@@ -256,29 +314,9 @@ public class Home extends Application {
                         "-fx-text-fill: #ECF0F1;"
         );
 
-        /*
-        // Effetto Hover
-        button.setOnMouseEntered(e -> button.setStyle(
-                "-fx-background-color: #3E556E;" +
-                        "-fx-padding: 12px;" +
-                        "-fx-border-radius: 10px;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-text-fill: #ECF0F1;"
-        ));
-
-        button.setOnMouseExited(e -> button.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-padding: 12px;" +
-                        "-fx-border-radius: 10px;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-text-fill: #ECF0F1;"
-        ));
-         */
-
         button.setMaxWidth(Double.MAX_VALUE); // Rende i bottoni larghi quanto la sidebar
         return button;
     }
-
 
     private void prepareAnimation() {
         AnimationTimer timer = new AnimationTimer() {
@@ -315,8 +353,7 @@ public class Home extends Application {
         PhongMaterial earthMaterial = new PhongMaterial();
         earthMaterial.setDiffuseMap(new Image("earth-d.jpg"));
         earthMaterial.setSelfIlluminationMap(new Image("earth-l.jpg"));
-        //Todo cambiare mapppa earthMaterial.setSpecularMap(new Image("earth-s.jpg"));
-        earthMaterial.setSpecularMap(new Image("provasutti.png"));
+        earthMaterial.setSpecularMap(new Image("earth-s.png"));
         earthMaterial.setBumpMap(new Image("earth-n.jpg"));
 
         sphere.setRotationAxis(Rotate.Y_AXIS);
