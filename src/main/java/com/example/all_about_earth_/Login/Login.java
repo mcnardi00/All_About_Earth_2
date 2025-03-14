@@ -83,7 +83,7 @@ public class Login extends Application {
         loginButton.setOnMouseExited(e -> loginButton.setStyle("-fx-background-color: #3498DB; -fx-border-radius: 10; " +
                 "-fx-background-radius: 10; -fx-padding: 12 30; -fx-font-size: 20px;"));
 
-        loginButton.setOnAction(e-> handLogin());
+        loginButton.setOnAction(e-> handLogin(stage));
 
         // Box per i campi di input e il bottone (centrato rispetto alla finestra)
         VBox textFieldBox = new VBox(20, gmailField, passwordField, loginButton);
@@ -109,7 +109,7 @@ public class Login extends Application {
         stage.show();
     }
 
-    public void handLogin(){
+    public void handLogin(Stage stage){
         String gmail = gmailField.getText();
         String psw = passwordField.getText();
 
@@ -117,7 +117,7 @@ public class Login extends Application {
             //EarthViewer earthViewer = new EarthViewer();
             //earthViewer.start(new Stage());
             Home home = new Home();
-            home.start(new Stage());
+            home.start(stage);
         }else{
             //Todo: print error
         }

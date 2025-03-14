@@ -66,6 +66,9 @@ public class Home extends Application {
     private boolean isRotating = true; // La Terra parte ruotando
     private AnimationTimer rotationTimer;
 
+    private Stage Loginstage;
+    private Stage homeStage = new Stage();
+
     @Override
     public void start(Stage stage) {
 
@@ -169,7 +172,7 @@ public class Home extends Application {
         scene.setCamera(camera);
 
         //Gestisce il controllo del mouse e del click
-        initMouseControl(world, scene, stage);
+        initMouseControl(world, scene,homeStage);
 
         //scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setTitle("All About Places");
