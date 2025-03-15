@@ -8,10 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.PickResult;
@@ -42,6 +39,8 @@ public class Home extends Application {
     private Button history;
 
     private HBox buttonBox;
+
+    private VBox sideBar = new VBox();
 
     private TextField searchField = new TextField();
 
@@ -139,7 +138,7 @@ public class Home extends Application {
         root.getChildren().add(buttonBox);
         root.getChildren().add(sidebarBox);
 
-        VBox sideBar = createSidebar();
+        sideBar = createSidebar();
 
         //Crea la sidebar
         sidebarButton.setOnAction(e -> {
@@ -149,13 +148,17 @@ public class Home extends Application {
                 root.getChildren().remove(sideBar);
                 isClicked = false;
             } else {  //Se la sidebar è chiusa
+                sideBar = createSidebar();
+
                 root.getChildren().add(sideBar);
 
+                //Azione per il bottone Impostazioni
                 settings.setOnAction(event -> System.out.println("Impostazioni cliccate"));
 
-                audio.setOnAction(event-> {
+                //Azione per il bottone Cronologia
+                history.setOnAction(event-> {
                     root.getChildren().remove(sideBar);
-                    //root.getChildren().add(createAudioSlider());
+                    //Todo: Mettere a schermo la cronologia root.getChildren().add(showHistory());
                 });
 
                 isClicked = true;
@@ -184,6 +187,30 @@ public class Home extends Application {
         prepareAnimation();
     }
 
+    public ContextMenu showHistory(){
+        //Todo:leggere da file la cronologia della ricerca
+
+        String[] locations = {"Milano,Roma"};
+
+        //Menu a comparsa
+        ContextMenu locationsMenu = new ContextMenu();
+
+        for(String location : locations){
+            //Item del menu
+            MenuItem menuItem = new MenuItem(location);
+
+            menuItem.setOnAction(e-> System.out.println("Hai selezionato " + location));
+
+            locationsMenu.getItems().add(menuItem);
+        }
+
+        // Mostra il menu al click
+        history.setOnAction(e -> locationsMenu.show(history, javafx.geometry.Side.BOTTOM, 0, 0));
+
+        return locationsMenu;
+
+    }
+
     //Crea la sidebar e i suoi bottoni
     public VBox createSidebar() {
         VBox sideBox = new VBox();
@@ -192,10 +219,10 @@ public class Home extends Application {
         //sideBox.setAlignment(Pos.CENTER_LEFT);
 
         settings = createSidebarButton("Impostazioni", "settingsWhite.png");
-        audio = createSidebarButton("Audio", "audio2.png");
+        //audio = createSidebarButton("Audio", "audio2.png");
         history = createSidebarButton("History", "history.png");
 
-        sideBox.getChildren().addAll(settings, audio, history);
+        sideBox.getChildren().addAll(settings, history);
         setSideButtonStyle();
         sideBox.setLayoutY(-100);
         sideBox.setLayoutX(-380);
@@ -291,12 +318,14 @@ public class Home extends Application {
                 "-fx-border-width: 1px; " +
                 "-fx-border-radius: 20;");
 
+        /*
         audio.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
                 "-fx-background-radius: 20; " +
                 "-fx-padding: 10; " +
                 "-fx-border-color: rgba(255, 255, 255, 0.5); " +
                 "-fx-border-width: 1px; " +
                 "-fx-border-radius: 20;");
+         */
 
         history.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
                 "-fx-background-radius: 20; " +
