@@ -203,21 +203,6 @@ public class Home extends Application {
         return sideBox;
     }
 
-    public HBox createAudioSlider(){
-        Slider audioSlider = new Slider();
-        audioSlider.setMax(10);
-        audioSlider.setMin(0);
-        audioSlider.setPrefWidth(100d);
-        audioSlider.setShowTickLabels(true);
-        audioSlider.setValue(5);
-
-        HBox sliderBox = new HBox(audioSlider);
-        sliderBox.setLayoutY(-50);
-        sliderBox.setLayoutX(-380);
-
-        return sliderBox;
-    }
-
     private HBox createSearchBar() {
         searchField.setPromptText("Cerca una località...");
         searchField.setPrefWidth(200);
@@ -463,6 +448,9 @@ public class Home extends Application {
         correctedLongitude = ((correctedLongitude + 180) % 360 + 360) % 360 - 180;
 
         System.out.printf("Cliccato su Lat: %.2f, Lon: %.2f%n", latitude, correctedLongitude);
+
+        Illustration illustration = new Illustration();
+        illustration.start(homeStage);
 
         // 🔄 Alterna lo stato della rotazione al click
         isRotating = !isRotating;
