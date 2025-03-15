@@ -1,19 +1,50 @@
 package com.example.all_about_earth_.API;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import javazoom.jl.player.Player;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class API {
 
     private final static String MAPS_API_KEY = "AIzaSyDA-cz4lKPKW4XS3iVHKX5qtStLBmsOw9w";
     private static final String GEMINI_API_KEY = "AIzaSyDGV9CmAf7cJDGs--3vpyecsgrMJLmVCEo";
+    private static final String ELEVENLABS_API_KEY = "sk_fd88bccbb515b640bf2f127b79007200fecefe7930644d3e";
 
     public static void main(String[] args) {
         double latitude = 58;
         double longitude = 18;
-        String response = sendPrompt("Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates"); // + nearbyCities.getFirst() + "\n\n if it's a encoded location search it on google earth"
+        String response = sendPrompt("Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a speech of max 100 words talking about the trivia and history");
         System.out.println(response);
+
+        JSONObject json = new JSONObject();
+        json.put("text", response);
+        json.put("model_id", "eleven_multilingual_v2");
+
+        try {
+            HttpResponse<InputStream> mp3 = Unirest.post("https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128")
+                    .header("xi-api-key", ELEVENLABS_API_KEY)
+                    .header("Content-Type", "application/json")
+                    .body(json.toString())
+                    .asBinary();
+
+            if (mp3.getStatus() == 200) {
+                ByteArrayInputStream bis = new ByteArrayInputStream(mp3.getBody().readAllBytes());
+                Player player = new Player(bis);
+                player.play();
+            } else {
+                System.out.println("Errore nella richiesta API: " + mp3.getStatus());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /*public static ArrayList<String> findNearestLocations(double lat, double lng) {
