@@ -140,7 +140,7 @@ public class Home extends Application {
 
         sideBar = createSidebar();
 
-        //Crea la sidebar
+        //Crea la sidebar e imposta i suoi eventi
         sidebarButton.setOnAction(e -> {
             System.out.println("sideButton cliccato");
 
@@ -157,8 +157,11 @@ public class Home extends Application {
 
                 //Azione per il bottone Cronologia
                 history.setOnAction(event-> {
-                    root.getChildren().remove(sideBar);
-                    //Todo: Mettere a schermo la cronologia root.getChildren().add(showHistory());
+                    LocationsMenu locationsMenu = new LocationsMenu();
+                    locationsMenu.start(new Stage());
+
+                    //sideBar.getChildren().remove(settings);
+                    //root.getChildren().remove(sideBar);
                 });
 
                 isClicked = true;
@@ -187,29 +190,6 @@ public class Home extends Application {
         prepareAnimation();
     }
 
-    public ContextMenu showHistory(){
-        //Todo:leggere da file la cronologia della ricerca
-
-        String[] locations = {"Milano,Roma"};
-
-        //Menu a comparsa
-        ContextMenu locationsMenu = new ContextMenu();
-
-        for(String location : locations){
-            //Item del menu
-            MenuItem menuItem = new MenuItem(location);
-
-            menuItem.setOnAction(e-> System.out.println("Hai selezionato " + location));
-
-            locationsMenu.getItems().add(menuItem);
-        }
-
-        // Mostra il menu al click
-        history.setOnAction(e -> locationsMenu.show(history, javafx.geometry.Side.BOTTOM, 0, 0));
-
-        return locationsMenu;
-
-    }
 
     //Crea la sidebar e i suoi bottoni
     public VBox createSidebar() {
