@@ -2,7 +2,6 @@ package com.example.all_about_earth_.API;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import javazoom.jl.player.Player;
 import okhttp3.*;
 import org.json.JSONArray;
@@ -20,7 +19,7 @@ public class API {
     public static void main(String[] args) {
         double latitude = 58;
         double longitude = 18;
-        String response = sendPrompt("Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a speech of max 100 words talking about the trivia and history");
+        String response = sendPrompt("Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a speech of max 100 words talking about the trivia and history ALL IN ITALIAN");
         System.out.println(response);
 
         JSONObject json = new JSONObject();
