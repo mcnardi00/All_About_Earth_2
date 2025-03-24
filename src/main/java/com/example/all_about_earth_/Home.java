@@ -13,8 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.PickResult;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
@@ -28,10 +27,8 @@ public class Home extends Application {
 
     //BOTTONI
     private final Button randomPointer = new Button();    //Bottone random
-    private final Button pointer = new Button();  //Bottone a scelta
+    private final Button searchButton = new Button();  //Bottone a scelta
     private final Button sidebarButton = new Button();
-
-    private Button searchButton;
 
     //Bottoni sideBar
     private Button settings;
@@ -65,8 +62,9 @@ public class Home extends Application {
     private boolean isRotating = true; // La Terra parte ruotando
     private AnimationTimer rotationTimer;
 
-    private Stage Loginstage;
     private Stage homeStage = new Stage();
+
+    private Search search = new Search();
 
     @Override
     public void start(Stage stage) {
@@ -96,17 +94,19 @@ public class Home extends Application {
         randomPointer.setGraphic(randomView);
 
         //Tasto pointer
-        Image pointerImage = new Image("pointer.png");
-        ImageView pointerView = new ImageView(pointerImage);
-        pointerView.setFitHeight(30);
-        pointerView.setFitWidth(30);
-        pointerView.setSmooth(true);
-        pointerView.setPreserveRatio(true);
-        pointer.setMaxSize(35, 35);
-        pointer.setGraphic(pointerView);
+        Image searchImage = new Image("lente.png");
+        ImageView searchView = new ImageView(searchImage);
+        searchView.setFitHeight(30);
+        searchView.setFitWidth(35);
+        searchView.setSmooth(true);
+        searchView.setPreserveRatio(true);
+        searchButton.setMaxSize(40, 50);
+        searchButton.setGraphic(searchView);
+
+        searchButton.setOnAction(e-> search.start(new Stage()));
 
         //Li inserisco nel HBox
-        buttonBox = new HBox(10, randomPointer, pointer); // 10 è il padding tra i bottoni
+        buttonBox = new HBox(10, randomPointer, searchButton); // 10 è il padding tra i bottoni
         buttonBox.setPadding(new Insets(0, 0, 20, 20));
         buttonBox.setLayoutX(290);
         buttonBox.setLayoutY(200);
@@ -169,9 +169,6 @@ public class Home extends Application {
 
         });
 
-        HBox searchBar = createSearchBar();
-        root.getChildren().add(searchBar);
-
         //Setto alla scena la camera
         Scene scene = new Scene(root, WIDTH, HEIGHT, true);
         scene.setFill(Color.SILVER);
@@ -210,19 +207,20 @@ public class Home extends Application {
         return sideBox;
     }
 
+    /*
     private HBox createSearchBar() {
         searchField.setPromptText("Cerca una località...");
         searchField.setPrefWidth(200);
         searchField.setPrefHeight(45);
         searchField.setStyle(
-                "-fx-background-color: rgba(255, 255, 255, 0.3);" +  // Sfondo semi-trasparente
+                "-fx-background-color: rgba(255, 255, 255, 0.3);" +
                         "-fx-background-radius: 20;" +
                         "-fx-padding: 5;" +
                         "-fx-border-color: rgba(255, 255, 255, 0.5);" +
                         "-fx-border-width: 1px;" +
                         "-fx-border-radius: 20;" +
-                        "-fx-text-fill: white;" +  // Testo bianco
-                        "-fx-prompt-text-fill: rgba(255, 255, 255, 0.7);" // Testo del placeholder visibile
+                        "-fx-text-fill: black;" +  // Cambia il colore del testo
+                        "-fx-prompt-text-fill: rgba(0, 0, 0, 0.5);" // Anche il placeholder più scuro
         );
 
         Image searchImage = new Image("lente.png");
@@ -253,11 +251,12 @@ public class Home extends Application {
 
         HBox searchBox = new HBox(10, searchButton, searchField);
         searchBox.setPadding(new Insets(10));
-        searchBox.setLayoutX(-140);
-        searchBox.setLayoutY(-270);
+        searchBox.setLayoutY(20); // Sposta la barra di ricerca più in alto
+        searchBox.setLayoutX(WIDTH / 2 - 150);
 
         return searchBox;
     }
+    */
 
     public void setButtonStyle() {
         randomPointer.setStyle(
@@ -270,7 +269,7 @@ public class Home extends Application {
                         "-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 2);"
         );
 
-        pointer.setStyle(
+        searchButton.setStyle(
                 "-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E); " +
                         "-fx-background-radius: 15; " +
                         "-fx-border-color: #ECF0F1; " +
