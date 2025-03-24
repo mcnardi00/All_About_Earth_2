@@ -18,10 +18,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
 public class Illustration extends Application {
     private BorderPane borderPane = new BorderPane();
     private StackPane generalPane = new StackPane();
@@ -29,7 +25,7 @@ public class Illustration extends Application {
     private Button audioButton = new Button();
     private VBox audioContainer = new VBox(10);
     private Slider audioSlider = new Slider();
-    private final API api = new API();
+    //private final API api = new API();
 
     @Override
     public void start(Stage stage) {
@@ -53,6 +49,7 @@ public class Illustration extends Application {
         titleBox.setPadding(new Insets(30, 0, 30, 0));
         borderPane.setTop(titleBox);
 
+        /*
         // **Caricamento immagine con bordo luminoso** toDo gestire il cambio delle foto con un timer
         ImageView imageView = null;
         try {
@@ -67,6 +64,8 @@ public class Illustration extends Application {
             e.printStackTrace();
         }
 
+         */
+
         // **Testo descrittivo con box trasparente**
         Label text = new Label(
                 "\uD83C\uDF0D La Terra è l'unico pianeta conosciuto per ospitare la vita.\n\n" +
@@ -80,8 +79,13 @@ public class Illustration extends Application {
         text.setPadding(new Insets(25));
         text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px;");
 
+        Image icon2 = new Image("provaImmagine.jpg");
+        ImageView iconView2 = new ImageView(icon2);
+        iconView2.setFitWidth(35);
+        iconView2.setFitHeight(35);
+
         // **Layout immagini e testo**
-        imageAndText.getChildren().addAll(imageView, text);
+        imageAndText.getChildren().addAll(iconView2, text);
         imageAndText.setAlignment(Pos.CENTER);
         borderPane.setCenter(imageAndText);
 
@@ -112,6 +116,7 @@ public class Illustration extends Application {
         generalPane.getChildren().add(borderPane);
 
         Scene scene = new Scene(generalPane, 1100, 750);
+        stage.setFullScreen(true);
         stage.setScene(scene);
         stage.setTitle("All About Earth 🌍");
         stage.show();
@@ -153,6 +158,8 @@ public class Illustration extends Application {
         ));
         audioButton.setEffect(new DropShadow(15, Color.BLACK));
     }
+
+
 
     public static void main(String[] args) {
         launch(args);

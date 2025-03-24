@@ -64,7 +64,8 @@ public class Home extends Application {
 
     private Stage homeStage = new Stage();
 
-    private Search search = new Search();
+    private Search search = new Search(this);
+    private String textFromSearch;
 
     @Override
     public void start(Stage stage) {
@@ -160,8 +161,6 @@ public class Home extends Application {
                     LocationsMenu locationsMenu = new LocationsMenu();
                     locationsMenu.start(new Stage());
 
-                    //sideBar.getChildren().remove(settings);
-                    //root.getChildren().remove(sideBar);
                 });
 
                 isClicked = true;
@@ -174,13 +173,15 @@ public class Home extends Application {
         scene.setFill(Color.SILVER);
         scene.setCamera(camera);
 
+
         //Gestisce il controllo del mouse e del click
         initMouseControl(world, scene,homeStage);
 
         //scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setTitle("All About Places");
         stage.setScene(scene);
-        stage.setFullScreen(true);
+        stage.setMaximized(true);
+
         stage.show();
 
         //Prepara l'animazione della terra che ruota
@@ -464,5 +465,8 @@ public class Home extends Application {
         isRotating = !isRotating;
     }
 
+    public void setTextFromSearch(String string){
+        textFromSearch = string;
+    }
 
 }
