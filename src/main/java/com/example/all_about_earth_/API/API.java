@@ -6,7 +6,6 @@ import javazoom.jl.player.Player;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -15,12 +14,24 @@ public class API {
     private final static String MAPS_API_KEY = "AIzaSyDA-cz4lKPKW4XS3iVHKX5qtStLBmsOw9w";
     private static final String GEMINI_API_KEY = "AIzaSyDGV9CmAf7cJDGs--3vpyecsgrMJLmVCEo";
     private static final String ELEVENLABS_API_KEY = "sk_fd88bccbb515b640bf2f127b79007200fecefe7930644d3e";
+    private double latitude, longitude;
+    private String place_name, place_id = getPlaceId();
 
-    public static void main(String[] args) {
-        double latitude = 58;
-        double longitude = 18;
-        String response = sendPrompt("Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a speech of max 100 words talking about the trivia and history ALL IN ITALIAN");
-        System.out.println(response);
+    /*public static void main(String[] args) {
+        String response = sendPrompt("Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a human type speech, that start with the name like the example Norrköping, Sweden of max 100 words talking about the trivia and history, ALL IN ITALIAN");
+
+        String[] temp = response.split("\n", 2);
+        temp = temp[1].trim().split(":", 2);
+
+        String place_name = temp[0];
+        System.out.println(temp[0] + temp[1]);
+
+        String place_id = getPlaceId(place_name);
+        if (place_id != null) {
+            getPlacePhotos(place_id);
+        } else {
+            System.out.println("Nessun place_id trovato.");
+        }
 
         JSONObject json = new JSONObject();
         json.put("text", response);
@@ -44,7 +55,7 @@ public class API {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     /*public static ArrayList<String> findNearestLocations(double lat, double lng) {
         ArrayList<String> locations = new ArrayList<>();
@@ -112,10 +123,9 @@ public class API {
         return locations;
     }*/
 
-    public static String sendPrompt(String prompt) {
+    public String sendPrompt(String prompt) {
         OkHttpClient httpClient = new OkHttpClient();
         try {
-            // Creazione del corpo della richiesta JSON
             JSONObject part = new JSONObject();
             part.put("text", prompt);
 
@@ -131,42 +141,96 @@ public class API {
             JSONObject requestBody = new JSONObject();
             requestBody.put("contents", contentsArray);
 
-            // Creazione della richiesta HTTP
             RequestBody body = RequestBody.create(
                     MediaType.get("application/json; charset=utf-8"),
                     requestBody.toString()
             );
 
-            okhttp3.Request request = new okhttp3.Request.Builder()
+            Request request = new Request.Builder()
                     .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY)
                     .post(body)
                     .build();
 
-            // Esecuzione della richiesta e gestione della risposta
             try (Response response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     return "Errore nella richiesta: " + response.code();
                 }
 
+                assert response.body() != null;
                 String responseBody = response.body().string();
                 JSONObject jsonResponse = new JSONObject(responseBody);
 
-                // Parsing della risposta di Gemini
+                //Parsing
                 JSONArray candidates = jsonResponse.optJSONArray("candidates");
-                if (candidates != null && candidates.length() > 0) {
+                if (candidates != null && !candidates.isEmpty()) {
                     JSONObject firstCandidate = candidates.getJSONObject(0);
                     JSONObject content0 = firstCandidate.getJSONObject("content");
                     JSONArray parts = content0.getJSONArray("parts");
-                    if (parts.length() > 0) {
+                    if (!parts.isEmpty()) {
                         JSONObject firstPart = parts.getJSONObject(0);
                         return firstPart.getString("text");
                     }
                 }
-                return "Nessuna risposta disponibile nel formato atteso.";
+                return "Nessuna risposta disponibile.";
             }
         }catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String getPlaceId(){
+        try{
+            OkHttpClient client = new OkHttpClient();
+            String url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?" + "input=" + place_name.replace(" ", "%20") + "&inputtype=textquery&fields=place_id&key=" + MAPS_API_KEY;
+
+            Request request = new Request.Builder().url(url).build();
+            Response response = client.newCall(request).execute();
+            assert response.body() != null;
+            String jsonResponse = response.body().string();
+
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+            JSONArray candidates = jsonObject.getJSONArray("candidates");
+
+            if (!candidates.isEmpty()) {
+                return candidates.getJSONObject(0).getString("place_id");
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public String[] getPlacePhotos(){
+        String[] photo = new String[10];
+        try{
+            OkHttpClient client = new OkHttpClient();
+            String url = "https://maps.googleapis.com/maps/api/place/details/json?" + "place_id=" + place_id + "&fields=photos&key=" + MAPS_API_KEY;
+
+            Request request = new Request.Builder().url(url).build();
+            Response response = client.newCall(request).execute();
+            assert response.body() != null;
+            String jsonResponse = response.body().string();
+
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+            JSONObject result = jsonObject.getJSONObject("result");
+
+            if (result.has("photos")) {
+                JSONArray photos = result.getJSONArray("photos");
+                int count = Math.min(photos.length(), 10); // Prende massimo 4 foto
+
+                for (int i = 0; i < count; i++) {
+                    String photoReference = photos.getJSONObject(i).getString("photo_reference");
+                    photo[i] = "https://maps.googleapis.com/maps/api/place/photo?" + "maxwidth=800&photo_reference=" + photoReference + "&key=" + MAPS_API_KEY;
+                }
+            } else {
+                System.out.println("Nessuna foto trovata.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return photo;
     }
 }

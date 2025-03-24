@@ -1,5 +1,6 @@
 package com.example.all_about_earth_;
 
+import com.example.all_about_earth_.API.API;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -17,6 +18,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
 public class Illustration extends Application {
     private BorderPane borderPane = new BorderPane();
     private StackPane generalPane = new StackPane();
@@ -24,6 +29,7 @@ public class Illustration extends Application {
     private Button audioButton = new Button();
     private VBox audioContainer = new VBox(10);
     private Slider audioSlider = new Slider();
+    private final API api = new API();
 
     @Override
     public void start(Stage stage) {
@@ -47,13 +53,19 @@ public class Illustration extends Application {
         titleBox.setPadding(new Insets(30, 0, 30, 0));
         borderPane.setTop(titleBox);
 
-        // **Caricamento immagine con bordo luminoso**
-        Image image = new Image("provaImmagine.jpg");
-        ImageView imageView = new ImageView(image);
-        imageView.setFitHeight(400);
-        imageView.setFitWidth(400);
-        imageView.setPreserveRatio(true);
-        imageView.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,255,255,0.8), 20, 0.3, 0, 0);");
+        // **Caricamento immagine con bordo luminoso** toDo gestire il cambio delle foto con un timer
+        ImageView imageView = null;
+        try {
+            String[] photos = api.getPlacePhotos();
+            InputStream stream = new URL(photos[0]).openStream();
+            Image image = new Image(stream);
+            imageView = new ImageView(image);
+            imageView.setFitWidth(200);
+            imageView.setPreserveRatio(true);
+            imageView.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,255,255,0.8), 20, 0.3, 0, 0);");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // **Testo descrittivo con box trasparente**
         Label text = new Label(
