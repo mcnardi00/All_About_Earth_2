@@ -4,15 +4,14 @@ import com.example.all_about_earth_.Object.Coordinate;
 import com.example.all_about_earth_.Object.Data;
 import com.example.all_about_earth_.Object.User;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 
 public class HistoryManager {
     private File f = new File("History.ser");
     private ArrayList<Data> data = new ArrayList<>();
+    private ArrayList<Coordinate> coordinate = new ArrayList<>();
+
 
     public void createFile(){
         try {
@@ -22,7 +21,8 @@ public class HistoryManager {
 
                 //User e coordinate di default
                 User user = new User("Utente","prova");
-                Coordinate coordinate = new Coordinate(1,1);
+                Coordinate coordinata = new Coordinate(1,1);
+                coordinate.add(coordinata);
 
                 Data data1 = new Data(coordinate, user);
                 data.add(data1);
@@ -37,4 +37,19 @@ public class HistoryManager {
             e.printStackTrace();
         }
     }
+
+    public void readFile(){
+        try {
+            FileInputStream fis = new FileInputStream(f);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            coordinate = (ArrayList<Coordinate>) ois.readObject();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException ignored) {
+        }
+    }
+
+    
 }

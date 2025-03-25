@@ -1,22 +1,23 @@
 package com.example.all_about_earth_.Object;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Data implements Serializable {
-    private Coordinate coordinate;
+    private ArrayList<Coordinate> coordinate;
     private User user;
     //private String prompt;
 
-    public Data(Coordinate coordinate, User user){
+    public Data(ArrayList<Coordinate> coordinate, User user){
         this.coordinate = coordinate;
         this.user = user;
     }
 
-    public Coordinate getCoordinate() {
+    public ArrayList<Coordinate> getCoordinate() {
         return coordinate;
     }
 
-    public void setCoordinate(Coordinate coordinate) {
+    public void setCoordinate(ArrayList<Coordinate> coordinate) {
         this.coordinate = coordinate;
     }
 
