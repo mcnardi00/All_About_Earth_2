@@ -105,7 +105,7 @@ public class API {
         OkHttpClient httpClient = new OkHttpClient();
         try {
             JSONObject part = new JSONObject();
-            part.put("text", "Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a human type speech, that start with the name like the example Norrköping, Sweden of max 100 words talking about the trivia and history, ALL IN ITALIAN");
+            part.put("text", "Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a human type speech, that start with the name like the example Norrköping, Sweden : of max 100 words talking about the trivia and history, ALL IN ITALIAN EXCEPT THE NAME OF THE CITY AND THE NAME OF THE STATE");
 
             JSONArray partsArray = new JSONArray();
             partsArray.put(part);
@@ -202,6 +202,7 @@ public class API {
             JSONArray candidates = jsonObject.getJSONArray("candidates");
 
             if (!candidates.isEmpty()) {
+                System.out.println("suttix: " + candidates.getJSONObject(0).getString("place_id"));
                 return candidates.getJSONObject(0).getString("place_id");
             }
             return null;
