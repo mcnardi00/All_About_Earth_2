@@ -1,5 +1,6 @@
 package com.example.all_about_earth_;
 
+import com.example.all_about_earth_.API.API;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
@@ -40,6 +41,8 @@ public class Home extends Application {
     private VBox sideBar = new VBox();
 
     private TextField searchField = new TextField();
+
+    private final API api = new API();
 
     //Dimensioni schermo
     private static final float WIDTH = 1500;
@@ -461,6 +464,9 @@ public class Home extends Application {
         double correctedLongitude = rawLongitude + angleY.get();
         correctedLongitude = ((correctedLongitude + 180) % 360 + 360) % 360 - 180;
 
+        api.setLatitude(latitude);
+        api.setLongitude(correctedLongitude);
+        api.sendPrompt();
         System.out.printf("Cliccato su Lat: %.2f, Lon: %.2f%n", latitude, correctedLongitude);
 
         Illustration illustration = new Illustration();
@@ -473,6 +479,10 @@ public class Home extends Application {
 
     public void setTextFromSearch(String string){
         textFromSearch = string;
+    }
+
+    public API getApi() {
+        return api;
     }
 
 }

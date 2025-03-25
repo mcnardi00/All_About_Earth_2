@@ -1,5 +1,8 @@
 package com.example.all_about_earth_;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -17,21 +20,26 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class Illustration extends Application {
-    private Home home = new Home(new Stage());
+    private final Home home = new Home(new Stage());
 
-    private BorderPane borderPane = new BorderPane();
-    private StackPane generalPane = new StackPane();
-    private HBox imageAndText = new HBox(30);
+    private final BorderPane borderPane = new BorderPane();
+    private final StackPane generalPane = new StackPane();
+    private final HBox imageAndText = new HBox(30);
 
     private VBox BottomContainer = new VBox(10);
-    private Slider audioSlider = new Slider();
+    private final Slider audioSlider = new Slider();
 
-    private Button audioButton = new Button();
+    private final Button audioButton = new Button();
 
-    private Button getBackButton = new Button();
-    //private final API api = new API();
+    private final Button getBackButton = new Button();
+
+    private final ImageView imageView = new ImageView();
+    private int currentImageIndex = 0;
+    private final String[] photoUrls = home.getApi().getPlacePhotos();
+
 
     @Override
     public void start(Stage stage) {
@@ -70,14 +78,13 @@ public class Illustration extends Application {
         text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px;");
 
         // **Immagine di prova**
-        Image icon2 = new Image("provaImmagine.jpg");
-        ImageView iconView2 = new ImageView(icon2);
-        iconView2.setFitWidth(450);
-        iconView2.setFitHeight(300);
-        iconView2.setStyle("-fx-padding: 3;");
+        imageView.setImage(new Image(photoUrls[0]));
+        imageView.setFitWidth(450);
+        imageView.setFitHeight(300);
+        imageView.setStyle("-fx-padding: 3;");
 
         //Contenitore immagine e testo
-        imageAndText.getChildren().addAll(iconView2, text);
+        imageAndText.getChildren().addAll(imageView, text);
         imageAndText.setAlignment(Pos.CENTER);
         borderPane.setCenter(imageAndText);
 
@@ -134,6 +141,7 @@ public class Illustration extends Application {
         stage.setTitle("All About Earth 🌍");
         stage.setMaximized(true);
         stage.show();
+        startImageSlideshow();
     }
 
 
@@ -205,8 +213,29 @@ public class Illustration extends Application {
         getBackButton.setEffect(new DropShadow(15, Color.BLACK)); // Ombra elegante
     }
 
+    private void startImageSlideshow() {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(10), event -> {
+            if (photoUrls.length > 0) {
+                currentImageIndex = (currentImageIndex + 1) % photoUrls.length;
+                Image newImage = new Image(photoUrls[currentImageIndex]);
+                imageView.setImage(newImage);
+            }
+        }));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
+
+
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public VBox getBottomContainer() {
+        return BottomContainer;
+    }
+
+    public void setBottomContainer(VBox bottomContainer) {
+        BottomContainer = bottomContainer;
     }
 }

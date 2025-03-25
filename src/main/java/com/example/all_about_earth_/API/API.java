@@ -2,10 +2,10 @@ package com.example.all_about_earth_.API;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import javazoom.jl.player.Player;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -13,17 +13,17 @@ public class API {
 
     private final static String MAPS_API_KEY = "AIzaSyDA-cz4lKPKW4XS3iVHKX5qtStLBmsOw9w";
     private static final String GEMINI_API_KEY = "AIzaSyDGV9CmAf7cJDGs--3vpyecsgrMJLmVCEo";
-    private static final String ELEVENLABS_API_KEY = "sk_fd88bccbb515b640bf2f127b79007200fecefe7930644d3e";
+    private static final String ELEVENLABS_API_KEY = "sk_fd88bccbb515b640bf2f127b79007200fecefe7930644d3e";// toDo controllare la API key prima di consegnare
     private double latitude, longitude;
-    private String place_name, place_id = getPlaceId();
+    private String writtenSpeech;
+    private ByteArrayInputStream spokenSpeech;
+    private String place_name;
+    private String place_id;
 
     /*public static void main(String[] args) {
-        String response = sendPrompt("Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a human type speech, that start with the name like the example Norrköping, Sweden of max 100 words talking about the trivia and history, ALL IN ITALIAN");
+        String response = sendPrompt();
 
-        String[] temp = response.split("\n", 2);
-        temp = temp[1].trim().split(":", 2);
 
-        String place_name = temp[0];
         System.out.println(temp[0] + temp[1]);
 
         String place_id = getPlaceId(place_name);
@@ -33,28 +33,6 @@ public class API {
             System.out.println("Nessun place_id trovato.");
         }
 
-        JSONObject json = new JSONObject();
-        json.put("text", response);
-        json.put("model_id", "eleven_multilingual_v2");
-
-        try {
-            HttpResponse<InputStream> mp3 = Unirest.post("https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128")
-                    .header("xi-api-key", ELEVENLABS_API_KEY)
-                    .header("Content-Type", "application/json")
-                    .body(json.toString())
-                    .asBinary();
-
-            if (mp3.getStatus() == 200) {
-                ByteArrayInputStream bis = new ByteArrayInputStream(mp3.getBody().readAllBytes());
-                Player player = new Player(bis);
-                player.play();
-            } else {
-                System.out.println("Errore nella richiesta API: " + mp3.getStatus());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }*/
 
     /*public static ArrayList<String> findNearestLocations(double lat, double lng) {
@@ -123,11 +101,11 @@ public class API {
         return locations;
     }*/
 
-    public String sendPrompt(String prompt) {
+    public void sendPrompt() {
         OkHttpClient httpClient = new OkHttpClient();
         try {
             JSONObject part = new JSONObject();
-            part.put("text", prompt);
+            part.put("text", "Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a human type speech, that start with the name like the example Norrköping, Sweden of max 100 words talking about the trivia and history, ALL IN ITALIAN");
 
             JSONArray partsArray = new JSONArray();
             partsArray.put(part);
@@ -153,7 +131,7 @@ public class API {
 
             try (Response response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
-                    return "Errore nella richiesta: " + response.code();
+                    System.out.println("Errore nella richiesta: " + response.code());
                 }
 
                 assert response.body() != null;
@@ -168,14 +146,44 @@ public class API {
                     JSONArray parts = content0.getJSONArray("parts");
                     if (!parts.isEmpty()) {
                         JSONObject firstPart = parts.getJSONObject(0);
-                        return firstPart.getString("text");
+                        String[] temp = firstPart.getString("text").split("\n", 2);
+                        temp = temp[1].trim().split(":", 2);
+                        place_name = temp[0];
+                        place_id = getPlaceId();
+                        writtenSpeech = temp[0] + temp[1];
+                        getSpeech();
                     }
                 }
-                return "Nessuna risposta disponibile.";
+                System.out.println("Nessuna risposta disponibile.");
             }
         }catch (Exception e) {
             e.printStackTrace();
-            return null;
+        }
+    }
+
+    public void getSpeech() {
+
+        JSONObject json = new JSONObject();
+        json.put("text", writtenSpeech);
+        json.put("model_id", "eleven_multilingual_v2");
+
+        try {
+            HttpResponse<InputStream> mp3 = Unirest.post("https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128")
+                    .header("xi-api-key", ELEVENLABS_API_KEY)
+                    .header("Content-Type", "application/json")
+                    .body(json.toString())
+                    .asBinary();
+
+            if (mp3.getStatus() == 200) {
+                spokenSpeech = new ByteArrayInputStream(mp3.getBody().readAllBytes());
+                /*Player player = new Player(bis);
+                player.play();*/
+            } else {
+                System.out.println("Errore nella richiesta API: " + mp3.getStatus());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -232,5 +240,25 @@ public class API {
             e.printStackTrace();
         }
         return photo;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public ByteArrayInputStream getSpokenSpeech() {
+        return spokenSpeech;
+    }
+
+    public String getWrittenSpeech() {
+        return writtenSpeech;
+    }
+
+    public String getPlace_name() {
+        return place_name;
     }
 }
