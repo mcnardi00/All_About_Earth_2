@@ -73,6 +73,8 @@ public class Home extends Application {
         homeStage = stage;
     }
 
+    public Home() {}
+
     @Override
     public void start(Stage stage) {
         Search search = new Search(this,homeStage);

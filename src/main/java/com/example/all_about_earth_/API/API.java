@@ -150,8 +150,9 @@ public class API {
                         temp = temp[1].trim().split(":", 2);
                         place_name = temp[0];
                         place_id = getPlaceId();
-                        writtenSpeech = temp[0] + temp[1];
-                        getSpeech();
+                        writtenSpeech = temp[0];
+                        //getSpeech(); toDo
+                        return;
                     }
                 }
                 System.out.println("Nessuna risposta disponibile.");

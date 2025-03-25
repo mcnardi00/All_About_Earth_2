@@ -63,11 +63,12 @@ public class Illustration extends Application {
         borderPane.setTop(titleBox);
 
         // **Testo descrittivo con box trasparente**
-        Label text = new Label(
+        /*Label text = new Label(
                 "\uD83C\uDF0D La Terra è l'unico pianeta conosciuto per ospitare la vita.\n\n" +
                         "\uD83C\uDFDE️ Coperta da oceani, foreste e montagne, offre un ambiente unico.\n\n" +
                         "\uD83C\uDF31 Studiare il nostro pianeta ci aiuta a preservarlo per il futuro."
-        );
+        );*/
+        Label text = new Label(home.getApi().getWrittenSpeech());
         text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 22));
         text.setTextFill(Color.WHITE);
         text.setWrapText(true);
@@ -76,7 +77,6 @@ public class Illustration extends Application {
         text.setPadding(new Insets(25));
         text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px;");
 
-        // **Immagine di prova**
         imageView.setImage(new Image(photoUrls[0]));
         imageView.setFitWidth(450);
         imageView.setFitHeight(300);
