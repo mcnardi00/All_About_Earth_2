@@ -77,7 +77,7 @@ public class Home extends Application {
 
     @Override
     public void start(Stage stage) {
-        Search search = new Search(this,homeStage);
+        Search search = new Search(this,homeStage,api);
 
         //Setto la camera e la sua visuale
         Camera camera = new PerspectiveCamera(true);
@@ -471,7 +471,7 @@ public class Home extends Application {
         api.sendPrompt();
         System.out.printf("Cliccato su Lat: %.2f, Lon: %.2f%n", latitude, correctedLongitude);
 
-        Illustration illustration = new Illustration();
+        Illustration illustration = new Illustration(api);
         illustration.start(new Stage());
         homeStage.close();
 

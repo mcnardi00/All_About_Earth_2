@@ -1,5 +1,6 @@
 package com.example.all_about_earth_.Applications;
 
+import com.example.all_about_earth_.API.API;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -39,6 +40,11 @@ public class Illustration extends Application {
     private int currentImageIndex = 0;
     private final String[] photoUrls = home.getApi().getPlacePhotos();
 
+    private API api;
+
+    public Illustration(API api){
+        this.api = api;
+    }
 
     @Override
     public void start(Stage stage) {

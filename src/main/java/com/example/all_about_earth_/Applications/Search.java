@@ -1,5 +1,6 @@
 package com.example.all_about_earth_.Applications;
 
+import com.example.all_about_earth_.API.API;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,10 +16,12 @@ public class Search extends Application {
     private Home home;
     private Stage homeStage;
     private Stage searchStage = new Stage();
+    private API api;
 
-    public Search(Home home, Stage stage){
+    public Search(Home home, Stage stage, API api){
         this.home = home;
         homeStage = stage;
+        this.api = api;
     }
 
     private TextField searchField = new TextField();
@@ -68,7 +71,7 @@ public class Search extends Application {
             //Se il testo non è vuoto invio il testo e apro lo stage
             if(!text.isEmpty()){
                 home.setTextFromSearch(text);
-                Illustration illustration = new Illustration();
+                Illustration illustration = new Illustration(api);
                 illustration.start(new Stage());
                 searchStage.close();
                 homeStage.close();
