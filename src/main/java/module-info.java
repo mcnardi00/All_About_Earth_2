@@ -8,8 +8,6 @@ module com.example.all_about_earth_ {
     requires unirest.java;
     requires jlayer;
 
-    exports com.example.all_about_earth_;
-
     exports com.example.all_about_earth_.Login;
     exports com.example.all_about_earth_.Object;
     exports com.example.all_about_earth_.Applications;
