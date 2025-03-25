@@ -146,10 +146,9 @@ public class API {
                     JSONArray parts = content0.getJSONArray("parts");
                     if (!parts.isEmpty()) {
                         JSONObject firstPart = parts.getJSONObject(0);
-                        String[] temp = firstPart.getString("text").split("\n", 2);
-                        temp = temp[1].trim().split(":", 2);
+                        String[] temp = firstPart.getString("text").split(":", 2);
                         place_name = temp[0];
-                        place_id = getPlaceId();
+                        getPlaceId();
                         writtenSpeech = temp[0];
                         //getSpeech(); toDo
                         return;
@@ -188,7 +187,7 @@ public class API {
         }
     }
 
-    public String getPlaceId(){
+    public void getPlaceId(){
         try{
             OkHttpClient client = new OkHttpClient();
             String url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?" + "input=" + place_name.replace(" ", "%20") + "&inputtype=textquery&fields=place_id&key=" + MAPS_API_KEY;
@@ -202,15 +201,13 @@ public class API {
             JSONArray candidates = jsonObject.getJSONArray("candidates");
 
             if (!candidates.isEmpty()) {
-                System.out.println("suttix: " + candidates.getJSONObject(0).getString("place_id"));
-                return candidates.getJSONObject(0).getString("place_id");
+                place_id = candidates.getJSONObject(0).getString("place_id");
+                System.out.println(place_id);
+                System.out.println(place_name);
             }
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
-
     }
 
     public String[] getPlacePhotos(){
@@ -218,6 +215,10 @@ public class API {
         try{
             OkHttpClient client = new OkHttpClient();
             String url = "https://maps.googleapis.com/maps/api/place/details/json?" + "place_id=" + place_id + "&fields=photos&key=" + MAPS_API_KEY;
+            System.out.println(url);
+            System.out.println(place_id);
+            System.out.println(place_name);
+
 
             Request request = new Request.Builder().url(url).build();
             Response response = client.newCall(request).execute();
