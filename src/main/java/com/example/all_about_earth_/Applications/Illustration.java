@@ -1,4 +1,4 @@
-package com.example.all_about_earth_;
+package com.example.all_about_earth_.Applications;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -13,7 +13,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
