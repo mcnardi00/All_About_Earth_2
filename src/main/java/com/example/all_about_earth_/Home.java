@@ -42,8 +42,8 @@ public class Home extends Application {
     private TextField searchField = new TextField();
 
     //Dimensioni schermo
-    private static final float WIDTH = 1400;
-    private static final float HEIGHT = 1000;
+    private static final float WIDTH = 1500;
+    private static final float HEIGHT = 1200;
 
     //Servono per la rotazione della sfera
     private double anchorX, anchorY;
@@ -64,11 +64,15 @@ public class Home extends Application {
 
     private Stage homeStage = new Stage();
 
-    private Search search = new Search(this);
     private String textFromSearch;
+
+    public Home(Stage stage){
+        homeStage = stage;
+    }
 
     @Override
     public void start(Stage stage) {
+        Search search = new Search(this,homeStage);
 
         //Setto la camera e la sua visuale
         Camera camera = new PerspectiveCamera(true);
@@ -94,7 +98,7 @@ public class Home extends Application {
         randomPointer.setMaxSize(40, 40);
         randomPointer.setGraphic(randomView);
 
-        //Tasto pointer
+        //Tasto ricerca
         Image searchImage = new Image("lente.png");
         ImageView searchView = new ImageView(searchImage);
         searchView.setFitHeight(30);
@@ -104,7 +108,11 @@ public class Home extends Application {
         searchButton.setMaxSize(40, 50);
         searchButton.setGraphic(searchView);
 
-        searchButton.setOnAction(e-> search.start(new Stage()));
+        //Fa partire il nuovo stage e chiude questo
+        searchButton.setOnAction(e-> {
+            search.start(stage);
+            //homeStage.close();
+        });
 
         //Li inserisco nel HBox
         buttonBox = new HBox(10, randomPointer, searchButton); // 10 è il padding tra i bottoni
@@ -139,16 +147,17 @@ public class Home extends Application {
         root.getChildren().add(buttonBox);
         root.getChildren().add(sidebarBox);
 
+        //Crea la sidebar e imposta i suoi eventi
         sideBar = createSidebar();
 
-        //Crea la sidebar e imposta i suoi eventi
         sidebarButton.setOnAction(e -> {
             System.out.println("sideButton cliccato");
 
-            if (isClicked) {  //Se la sidebar è aperta
+            //Se la sidebar è aperta la tolgo
+            if (isClicked) {
                 root.getChildren().remove(sideBar);
                 isClicked = false;
-            } else {  //Se la sidebar è chiusa
+            } else {  //Se la sidebar è chiusa la apro
                 sideBar = createSidebar();
 
                 root.getChildren().add(sideBar);
@@ -159,8 +168,8 @@ public class Home extends Application {
                 //Azione per il bottone Cronologia
                 history.setOnAction(event-> {
                     LocationsMenu locationsMenu = new LocationsMenu();
-                    locationsMenu.start(new Stage());
-
+                    locationsMenu.start(stage);
+                    homeStage.close();
                 });
 
                 isClicked = true;
@@ -178,11 +187,11 @@ public class Home extends Application {
         initMouseControl(world, scene,homeStage);
 
         //scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        stage.setTitle("All About Places");
-        stage.setScene(scene);
-        stage.setMaximized(true);
+        homeStage.setTitle("All About Places");
+        homeStage.setScene(scene);
+        homeStage.setMaximized(true);
 
-        stage.show();
+        homeStage.show();
 
         //Prepara l'animazione della terra che ruota
         prepareAnimation();
@@ -194,10 +203,8 @@ public class Home extends Application {
         VBox sideBox = new VBox();
         sideBox.setSpacing(15);
         sideBox.setPadding(new Insets(20));
-        //sideBox.setAlignment(Pos.CENTER_LEFT);
 
         settings = createSidebarButton("Impostazioni", "settingsWhite.png");
-        //audio = createSidebarButton("Audio", "audio2.png");
         history = createSidebarButton("History", "history.png");
 
         sideBox.getChildren().addAll(settings, history);
@@ -259,6 +266,7 @@ public class Home extends Application {
     }
     */
 
+    //Fornisce lo stile ai bottoni in basso a destra
     public void setButtonStyle() {
         randomPointer.setStyle(
                 "-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E); " +
@@ -290,6 +298,7 @@ public class Home extends Application {
         );
     }
 
+    //Fornisce lo stile ai bottoni della sidebar
     public void setSideButtonStyle() {
         settings.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
                 "-fx-background-radius: 20; " +
@@ -297,15 +306,6 @@ public class Home extends Application {
                 "-fx-border-color: rgba(255, 255, 255, 0.5); " +
                 "-fx-border-width: 1px; " +
                 "-fx-border-radius: 20;");
-
-        /*
-        audio.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
-                "-fx-background-radius: 20; " +
-                "-fx-padding: 10; " +
-                "-fx-border-color: rgba(255, 255, 255, 0.5); " +
-                "-fx-border-width: 1px; " +
-                "-fx-border-radius: 20;");
-         */
 
         history.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
                 "-fx-background-radius: 20; " +
@@ -315,13 +315,14 @@ public class Home extends Application {
                 "-fx-border-radius: 20;");
     }
 
-
+    //Crea i bottoni per la sidebar
     public Button createSidebarButton(String text, String image) {
         Image icon = new Image(image);
         ImageView iconView = new ImageView(icon);
         iconView.setFitWidth(30);
         iconView.setFitHeight(30);
 
+        //Testo del bottone
         Label label = new Label(text);
         label.setTextFill(Color.web("#ECF0F1"));
         label.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
@@ -339,10 +340,11 @@ public class Home extends Application {
                         "-fx-text-fill: #ECF0F1;"
         );
 
-        button.setMaxWidth(Double.MAX_VALUE); // Rende i bottoni larghi quanto la sidebar
+        button.setMaxWidth(Double.MAX_VALUE);
         return button;
     }
 
+    //Rotazione della terra
     private void prepareAnimation() {
         rotationTimer = new AnimationTimer() {
             @Override
@@ -355,7 +357,7 @@ public class Home extends Application {
         rotationTimer.start();
     }
 
-
+    //Sfondo
     private ImageView prepareImageView() {
         Image image = new Image("galaxy.jpg");
         ImageView imageView = new ImageView(image);
@@ -364,6 +366,7 @@ public class Home extends Application {
         return imageView;
     }
 
+    //Slider
     private Slider prepareSlider() {
         Slider slider = new Slider();
         slider.setMax(800);
@@ -377,6 +380,7 @@ public class Home extends Application {
         return slider;
     }
 
+    //Mette le immagini sulla sfera
     private Node prepareEarth() {
         PhongMaterial earthMaterial = new PhongMaterial();
         earthMaterial.setDiffuseMap(new Image("earth-d.jpg"));
@@ -389,6 +393,7 @@ public class Home extends Application {
         return sphere;
     }
 
+    //Gestisce il mouse e la rotazione
     private void initMouseControl(Group group, Scene scene, Stage stage) {
         Rotate xRotate;
         Rotate yRotate;
@@ -437,7 +442,7 @@ public class Home extends Application {
 
     }
 
-
+    //Gestisce il click della terra e prende le coordinate
     private void handleEarthClick(javafx.scene.input.MouseEvent event) {
         PickResult pickResult = event.getPickResult();
         if (pickResult == null || pickResult.getIntersectedNode() != sphere) {
@@ -459,9 +464,10 @@ public class Home extends Application {
         System.out.printf("Cliccato su Lat: %.2f, Lon: %.2f%n", latitude, correctedLongitude);
 
         Illustration illustration = new Illustration();
-        illustration.start(homeStage);
+        illustration.start(new Stage());
+        homeStage.close();
 
-        // 🔄 Alterna lo stato della rotazione al click
+        //Se sta routando la ferma
         isRotating = !isRotating;
     }
 

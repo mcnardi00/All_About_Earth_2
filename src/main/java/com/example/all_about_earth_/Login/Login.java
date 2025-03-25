@@ -20,6 +20,8 @@ import javafx.stage.Stage;
 
 public class Login extends Application {
 
+    private Stage loginStage = new Stage();
+
     private LoginManager loginManager = new LoginManager();
 
     private Color allColor = Color.rgb(255, 255, 255);
@@ -103,10 +105,10 @@ public class Login extends Application {
         mainLayout.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // Scena a schermo intero
-        Scene scene = new Scene(mainLayout, 1280, 800);
-        stage.setScene(scene);
-        stage.setFullScreen(true);
-        stage.show();
+        Scene scene = new Scene(mainLayout, 1500, 1200);
+        loginStage.setScene(scene);
+        loginStage.setMaximized(true);
+        loginStage.show();
     }
 
     public void handLogin(Stage stage){
@@ -116,8 +118,10 @@ public class Login extends Application {
         if(loginManager.checkUser(new User(gmail,psw))){
             //EarthViewer earthViewer = new EarthViewer();
             //earthViewer.start(new Stage());
-            Home home = new Home();
+            Home home = new Home(stage);
             home.start(stage);
+            loginStage.close();
+
         }else{
             //Todo: print error
         }

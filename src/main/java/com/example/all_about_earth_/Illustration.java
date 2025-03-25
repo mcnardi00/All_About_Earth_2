@@ -1,6 +1,5 @@
 package com.example.all_about_earth_;
 
-import com.example.all_about_earth_.API.API;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -14,17 +13,24 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class Illustration extends Application {
+    private Home home = new Home(new Stage());
+
     private BorderPane borderPane = new BorderPane();
     private StackPane generalPane = new StackPane();
     private HBox imageAndText = new HBox(30);
-    private Button audioButton = new Button();
-    private VBox audioContainer = new VBox(10);
+
+    private VBox BottomContainer = new VBox(10);
     private Slider audioSlider = new Slider();
+
+    private Button audioButton = new Button();
+
+    private Button getBackButton = new Button();
     //private final API api = new API();
 
     @Override
@@ -49,23 +55,6 @@ public class Illustration extends Application {
         titleBox.setPadding(new Insets(30, 0, 30, 0));
         borderPane.setTop(titleBox);
 
-        /*
-        // **Caricamento immagine con bordo luminoso** toDo gestire il cambio delle foto con un timer
-        ImageView imageView = null;
-        try {
-            String[] photos = api.getPlacePhotos();
-            InputStream stream = new URL(photos[0]).openStream();
-            Image image = new Image(stream);
-            imageView = new ImageView(image);
-            imageView.setFitWidth(200);
-            imageView.setPreserveRatio(true);
-            imageView.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,255,255,0.8), 20, 0.3, 0, 0);");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-         */
-
         // **Testo descrittivo con box trasparente**
         Label text = new Label(
                 "\uD83C\uDF0D La Terra è l'unico pianeta conosciuto per ospitare la vita.\n\n" +
@@ -76,20 +65,23 @@ public class Illustration extends Application {
         text.setTextFill(Color.WHITE);
         text.setWrapText(true);
         text.setMaxWidth(450);
+        text.setMaxHeight(300);
         text.setPadding(new Insets(25));
         text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px;");
 
+        // **Immagine di prova**
         Image icon2 = new Image("provaImmagine.jpg");
         ImageView iconView2 = new ImageView(icon2);
-        iconView2.setFitWidth(35);
-        iconView2.setFitHeight(35);
+        iconView2.setFitWidth(450);
+        iconView2.setFitHeight(300);
+        iconView2.setStyle("-fx-padding: 3;");
 
-        // **Layout immagini e testo**
+        //Contenitore immagine e testo
         imageAndText.getChildren().addAll(iconView2, text);
         imageAndText.setAlignment(Pos.CENTER);
         borderPane.setCenter(imageAndText);
 
-        // **Pulsante audio stilizzato**
+        //Bottone audio
         Image icon = new Image("audio.png");
         ImageView iconView = new ImageView(icon);
         iconView.setFitWidth(35);
@@ -99,29 +91,53 @@ public class Illustration extends Application {
         audioButton.setMinSize(70, 70);
 
         setAudioButtonStyle();
-
         setAudioSliderStyle();
-        
 
-        audioContainer.getChildren().addAll(audioSlider, audioButton);
-        audioContainer.setAlignment(Pos.BOTTOM_RIGHT);
-        audioContainer.setPadding(new Insets(20));
+        //Box per audio in basso a destra
+        HBox audioBox = new HBox(10, audioSlider, audioButton);
+        audioBox.setAlignment(Pos.CENTER_RIGHT);
+        audioSlider.setVisible(false);
+        audioButton.setOnAction(e -> audioSlider.setVisible(!audioSlider.isVisible()));
 
-        borderPane.setBottom(audioContainer);
+        //Bottone torna indietro
+        Image getBack = new Image("back.png");
+        ImageView getBackView = new ImageView(getBack);
+        getBackView.setFitWidth(35);
+        getBackView.setFitHeight(35);
 
-        audioButton.setOnAction(e -> {
-            audioSlider.setVisible(!audioSlider.isVisible());
+        getBackButton.setGraphic(getBackView);
+        getBackButton.setMinSize(70, 70);
+
+        getBackButton.setOnAction(e->{
+            home.start(new Stage());
+            stage.close();
+
         });
 
+        setBackButtonStyle();
+
+        //Box per bottone torna indietro in basso a sinistra
+        HBox backBox = new HBox(getBackButton);
+        backBox.setAlignment(Pos.CENTER_LEFT);
+
+        //Container inferiore
+        BorderPane bottomLayout = new BorderPane();
+        bottomLayout.setPadding(new Insets(20)); // Padding uniforme
+        bottomLayout.setLeft(backBox);
+        bottomLayout.setRight(audioBox);
+
+        borderPane.setBottom(bottomLayout);
         generalPane.getChildren().add(borderPane);
 
-        Scene scene = new Scene(generalPane, 1100, 750);
-        stage.setFullScreen(true);
+        Scene scene = new Scene(generalPane, 1500, 1200);
         stage.setScene(scene);
         stage.setTitle("All About Earth 🌍");
+        stage.setMaximized(true);
         stage.show();
     }
 
+
+    //Fornisce stile allo slider
     public void setAudioSliderStyle() {
         // **Slider audio inizialmente nascosto**
         audioSlider.setMax(10);
@@ -134,6 +150,7 @@ public class Illustration extends Application {
         audioSlider.setVisible(false);
     }
 
+    //Fornisce stile al bottone dell'audio
     public void setAudioButtonStyle(){
         audioButton.setStyle(
                 "-fx-background-color: linear-gradient(to bottom, #ff8c00, #ff4500); " +
@@ -159,6 +176,34 @@ public class Illustration extends Application {
         audioButton.setEffect(new DropShadow(15, Color.BLACK));
     }
 
+    //Fornisce lo stile al bottone per tornare indietro
+    public void setBackButtonStyle() {
+        getBackButton.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #0077b6, #023e8a); " + // Blu elegante
+                        "-fx-background-radius: 50px; " +
+                        "-fx-border-color: white; " +
+                        "-fx-border-width: 3px; " +
+                        "-fx-border-radius: 50px;"
+        );
+
+        getBackButton.setOnMouseEntered(e -> getBackButton.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #023e8a, #0077b6); " + // Inversione del gradiente
+                        "-fx-background-radius: 50px; " +
+                        "-fx-border-color: white; " +
+                        "-fx-border-width: 3px; " +
+                        "-fx-border-radius: 50px;"
+        ));
+
+        getBackButton.setOnMouseExited(e -> getBackButton.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #0077b6, #023e8a); " +
+                        "-fx-background-radius: 50px; " +
+                        "-fx-border-color: white; " +
+                        "-fx-border-width: 3px; " +
+                        "-fx-border-radius: 50px;"
+        ));
+
+        getBackButton.setEffect(new DropShadow(15, Color.BLACK)); // Ombra elegante
+    }
 
 
     public static void main(String[] args) {

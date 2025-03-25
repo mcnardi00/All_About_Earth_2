@@ -10,18 +10,23 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+//Stage che fa aprire la barra di ricerca
 public class Search extends Application {
     private Home home;
-    private Illustration illustration = new Illustration();
+    private Stage homeStage;
+    private Stage searchStage = new Stage();
 
-    public Search(Home home){
+    public Search(Home home, Stage stage){
         this.home = home;
+        homeStage = stage;
     }
 
     private TextField searchField = new TextField();
 
     @Override
     public void start(Stage stage){
+
+        //Textfield della barra di ricerca
         searchField.setPromptText("Cerca una località...");
         searchField.setMaxWidth(200);
         searchField.setMaxHeight(45);
@@ -36,6 +41,7 @@ public class Search extends Application {
                         "-fx-prompt-text-fill: rgba(0, 0, 0, 0.5);" // Anche il placeholder più scuro
         );
 
+        //Immagine della lente d'ingrandimento
         Image searchImage = new Image("lente.png");
         ImageView searchView = new ImageView(searchImage);
         searchView.setFitWidth(35);
@@ -43,6 +49,7 @@ public class Search extends Application {
         searchView.setSmooth(true);
         searchView.setPreserveRatio(true);
 
+        //Bottone per inviare la ricerca
         Button searchButton = new Button();
         searchButton.setMaxSize(40, 40);
         searchButton.setGraphic(searchView);
@@ -58,10 +65,13 @@ public class Search extends Application {
         searchButton.setOnAction(e->{
             String text = searchField.getText();
 
+            //Se il testo non è vuoto invio il testo e apro lo stage
             if(!text.isEmpty()){
                 home.setTextFromSearch(text);
+                Illustration illustration = new Illustration();
                 illustration.start(new Stage());
-
+                searchStage.close();
+                homeStage.close();
 
                 //todo: fare richiesta api
             }else{
@@ -74,19 +84,16 @@ public class Search extends Application {
 
         Scene scene = new Scene(hBox,200,45);
 
-        stage.setScene(scene);
-        stage.setMaxWidth(200);
-        stage.setMaxHeight(300);
-        stage.setX(1175);
-        stage.setY(650);
+        searchStage.setScene(scene);
+        searchStage.setMaxWidth(200);
+        searchStage.setMaxHeight(300);
+        searchStage.setX(1175);
+        searchStage.setY(650);
 
-        stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
+        searchStage.setResizable(false);
+        searchStage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.show();
+        searchStage.show();
     }
 
-    public String getSearchedText(){
-        return searchField.getText();
-    }
 }
