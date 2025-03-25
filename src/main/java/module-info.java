@@ -11,4 +11,7 @@ module com.example.all_about_earth_ {
     exports com.example.all_about_earth_;
 
     exports com.example.all_about_earth_.Login;
+    exports com.example.all_about_earth_.Object;
+    exports com.example.all_about_earth_.Applications;
+    exports com.example.all_about_earth_.Managers;
 }

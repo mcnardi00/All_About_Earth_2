@@ -1,4 +1,4 @@
-package com.example.all_about_earth_;
+package com.example.all_about_earth_.Applications;
 
 import com.example.all_about_earth_.API.API;
 import javafx.animation.AnimationTimer;
