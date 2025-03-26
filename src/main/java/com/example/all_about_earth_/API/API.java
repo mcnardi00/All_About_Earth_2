@@ -70,7 +70,7 @@ public class API {
                     JSONArray parts = content0.getJSONArray("parts");
                     if (!parts.isEmpty()) {
                         JSONObject firstPart = parts.getJSONObject(0);
-                        String[] temp = firstPart.getString("text").split(":", 2);
+                        String[] temp = firstPart.getString("text").split("\n", 2);
                         place_name = temp[0];
                         getPlaceId();
                         writtenSpeech = temp[0] + temp[1];
@@ -81,7 +81,6 @@ public class API {
                 System.out.println("Nessuna risposta disponibile.");
             }
         }catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -135,7 +134,7 @@ public class API {
                     JSONArray parts = content0.getJSONArray("parts");
                     if (!parts.isEmpty()) {
                         JSONObject firstPart = parts.getJSONObject(0);
-                        String[] temp = firstPart.getString("text").split(":", 2);
+                        String[] temp = firstPart.getString("text").split("\n", 2);
                         place_name = temp[0];
                         getPlaceId();
                         writtenSpeech = temp[0] + temp[1];
@@ -215,7 +214,7 @@ public class API {
 
                 for (int i = 0; i < count; i++) {
                     String photoReference = photos.getJSONObject(i).getString("photo_reference");
-                    photo[i] = "https://maps.googleapis.com/maps/api/place/photo?" + "maxwidth=800&photo_reference=" + photoReference + "&key=" + MAPS_API_KEY;
+                    photo[i] = "https://maps.googleapis.com/maps/api/place/photo?" + "maxwidth=1050&photo_reference=" + photoReference + "&key=" + MAPS_API_KEY;
                 }
             } else {
                 System.out.println("Nessuna foto trovata.");

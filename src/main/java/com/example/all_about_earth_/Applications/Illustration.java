@@ -71,27 +71,24 @@ public class Illustration extends Application {
         borderPane.setTop(titleBox);
 
         // **Testo descrittivo con box trasparente**
-        /*Label text = new Label(
-                "\uD83C\uDF0D La Terra è l'unico pianeta conosciuto per ospitare la vita.\n\n" +
-                        "\uD83C\uDFDE️ Coperta da oceani, foreste e montagne, offre un ambiente unico.\n\n" +
-                        "\uD83C\uDF31 Studiare il nostro pianeta ci aiuta a preservarlo per il futuro."
-        );*/
         api.sendPrompt();
 
-        String formattedText = api.getWrittenSpeech().replace("**", "").replace("\n", "\n\n");
+        String formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ","").trim();
         Label text = new Label(formattedText);
         System.out.println(formattedText);
-        text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 22));
+        text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 18));
         text.setTextFill(Color.WHITE);
         text.setWrapText(true);
-        text.setMaxWidth(500);
+        text.setMaxWidth(800);
+        text.setMaxHeight(700);
         text.setPadding(new Insets(25));
         text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px; -fx-border-color: white; -fx-border-width: 2px; -fx-alignment: center;");
+        text.setWrapText(true);
 
         photoUrls = api.getPlacePhotos();
         imageView.setImage(new Image(photoUrls[0]));
-        imageView.setFitWidth(450);
-        imageView.setFitHeight(300);
+        imageView.setFitWidth(1050);
+        imageView.setFitHeight(700);
         imageView.setStyle("-fx-padding: 3;");
 
         //Contenitore immagine e testo
