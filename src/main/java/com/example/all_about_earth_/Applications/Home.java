@@ -50,6 +50,9 @@ public class Home extends Application {
     private static final float WIDTH = 1500;
     private static final float HEIGHT = 1200;
 
+    private double screenWidth;
+    private double screenHeight;
+
     //Servono per la rotazione della sfera
     private double anchorX, anchorY;
     private double anchorAngleX = 0;
@@ -69,6 +72,8 @@ public class Home extends Application {
 
     private Stage homeStage = new Stage();
 
+    private Scene scene;
+
     private String textFromSearch;
 
     public Home(Stage stage){
@@ -82,8 +87,8 @@ public class Home extends Application {
         Search search = new Search(this,homeStage,api);
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        double screenWidth = screenBounds.getWidth();
-        double screenHeight = screenBounds.getHeight();
+        screenWidth = screenBounds.getWidth();
+        screenHeight = screenBounds.getHeight();
 
         //Setto la camera e la sua visuale
         Camera camera = new PerspectiveCamera(true);
@@ -128,6 +133,8 @@ public class Home extends Application {
         //Li inserisco nel HBox
         buttonBox = new HBox(10, randomPointer, searchButton); // 10 è il padding tra i bottoni
         buttonBox.setPadding(new Insets(0, 0, 20, 20));
+
+
         buttonBox.setLayoutX(290);
         buttonBox.setLayoutY(200);
 
@@ -188,11 +195,17 @@ public class Home extends Application {
 
         });
 
-        //Setto alla scena la camera
-        Scene scene = new Scene(root, WIDTH, HEIGHT, true);
-        scene.setFill(Color.SILVER);
-        scene.setCamera(camera);
-
+        if(screenHeight == 1032.0 && screenWidth == 1920.0){
+            //Setto alla scena la camera
+            scene = new Scene(root, 1920, 1032, true);
+            scene.setFill(Color.SILVER);
+            scene.setCamera(camera);
+        }else{
+            //Setto alla scena la camera
+            scene = new Scene(root, WIDTH, HEIGHT, true);
+            scene.setFill(Color.SILVER);
+            scene.setCamera(camera);
+        }
 
         //Gestisce il controllo del mouse e del click
         initMouseControl(world, scene,homeStage);
@@ -200,7 +213,7 @@ public class Home extends Application {
         //scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         homeStage.setTitle("All About Places");
         homeStage.setScene(scene);
-        homeStage.setMaximized(true);
+        //homeStage.setMaximized(true);
 
         homeStage.show();
 
