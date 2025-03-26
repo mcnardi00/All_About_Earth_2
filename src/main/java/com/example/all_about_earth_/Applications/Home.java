@@ -474,7 +474,6 @@ public class Home extends Application {
 
         api.setLatitude(latitude);
         api.setLongitude(correctedLongitude);
-        api.sendPrompt();
         System.out.printf("Cliccato su Lat: %.2f, Lon: %.2f%n", latitude, correctedLongitude);
 
         Illustration illustration = new Illustration(api);
@@ -487,10 +486,6 @@ public class Home extends Application {
 
     public void setTextFromSearch(String string){
         textFromSearch = string;
-    }
-
-    public API getApi() {
-        return api;
     }
 
 }

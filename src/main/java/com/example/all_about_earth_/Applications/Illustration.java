@@ -21,6 +21,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 
 public class Illustration extends Application {
     private final Home home = new Home(new Stage());
@@ -36,15 +38,15 @@ public class Illustration extends Application {
 
     private final Button getBackButton = new Button();
 
-    private final ImageView imageView = new ImageView();
-    private int currentImageIndex = 0;
-    private final String[] photoUrls = home.getApi().getPlacePhotos();
-
     private API api;
 
     public Illustration(API api){
         this.api = api;
     }
+
+    private final ImageView imageView = new ImageView();
+    private int currentImageIndex = 0;
+    private String[] photoUrls;
 
     @Override
     public void start(Stage stage) {
@@ -74,15 +76,18 @@ public class Illustration extends Application {
                         "\uD83C\uDFDE️ Coperta da oceani, foreste e montagne, offre un ambiente unico.\n\n" +
                         "\uD83C\uDF31 Studiare il nostro pianeta ci aiuta a preservarlo per il futuro."
         );*/
-        Label text = new Label(home.getApi().getWrittenSpeech());
+        api.sendPrompt();
+        String formattedText = api.getWrittenSpeech().replace("**", "").replace("\n", "\n\n");
+        Label text = new Label(formattedText);
+        System.out.println(formattedText);
         text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 22));
         text.setTextFill(Color.WHITE);
         text.setWrapText(true);
-        text.setMaxWidth(450);
-        text.setMaxHeight(300);
+        text.setMaxWidth(500);
         text.setPadding(new Insets(25));
-        text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px;");
+        text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px; -fx-border-color: white; -fx-border-width: 2px; -fx-alignment: center;");
 
+        photoUrls = api.getPlacePhotos();
         imageView.setImage(new Image(photoUrls[0]));
         imageView.setFitWidth(450);
         imageView.setFitHeight(300);
@@ -110,6 +115,15 @@ public class Illustration extends Application {
         audioBox.setAlignment(Pos.CENTER_RIGHT);
         audioSlider.setVisible(false);
         audioButton.setOnAction(e -> audioSlider.setVisible(!audioSlider.isVisible()));
+
+        /* toDo riproduzione audio
+        Player player = null;
+        try {
+            player = new Player(api.getSpokenSpeech());
+            player.play();
+        } catch (JavaLayerException e) {
+            throw new RuntimeException(e);
+        }*/
 
         //Bottone torna indietro
         Image getBack = new Image("back.png");
@@ -234,13 +248,5 @@ public class Illustration extends Application {
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    public VBox getBottomContainer() {
-        return BottomContainer;
-    }
-
-    public void setBottomContainer(VBox bottomContainer) {
-        BottomContainer = bottomContainer;
     }
 }

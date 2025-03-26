@@ -20,92 +20,16 @@ public class API {
     private String place_name;
     private String place_id;
 
-    /*public static void main(String[] args) {
-        String response = sendPrompt();
-
-
-        System.out.println(temp[0] + temp[1]);
-
-        String place_id = getPlaceId(place_name);
-        if (place_id != null) {
-            getPlacePhotos(place_id);
-        } else {
-            System.out.println("Nessun place_id trovato.");
-        }
-
-    }*/
-
-    /*public static ArrayList<String> findNearestLocations(double lat, double lng) {
-        ArrayList<String> locations = new ArrayList<>();
-
-        String urlString = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&key=" + MAPS_API_KEY;
-
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-
-            Scanner scanner = new Scanner(conn.getInputStream());
-            StringBuilder response = new StringBuilder();
-            while (scanner.hasNext()) {
-                response.append(scanner.nextLine());
-            }
-            scanner.close();
-
-            Gson gson = new Gson();
-            JsonObject jsonResponse = gson.fromJson(response.toString(), JsonObject.class);
-            JsonArray results = jsonResponse.getAsJsonArray("results");
-
-            if (results != null && results.size() > 0) {
-                for (JsonElement resultElement : results) {
-                    JsonObject result = resultElement.getAsJsonObject();
-
-                    if (result.has("formatted_address")) {
-                        String formattedAddress = result.get("formatted_address").getAsString();
-                        locations.add(formattedAddress);
-                    }
-
-                    if (result.has("address_components")) {
-                        JsonArray addressComponents = result.getAsJsonArray("address_components");
-                        for (JsonElement componentElement : addressComponents) {
-                            JsonObject component = componentElement.getAsJsonObject();
-                            JsonArray types = component.getAsJsonArray("types");
-
-                            for (JsonElement typeElement : types) {
-                                String type = typeElement.getAsString();
-
-                                if (type.equals("country") ||
-                                        type.equals("administrative_area_level_1") ||
-                                        type.equals("locality") ||
-                                        type.equals("postal_town")) {
-
-                                    String locationName = component.get("long_name").getAsString();
-                                    if (!locations.contains(locationName)) {
-                                        locations.add(locationName);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (locations.isEmpty()) {
-            locations.add("Nessun luogo identificato per le coordinate specificate.");
-        }
-
-        return locations;
-    }*/
-
     public void sendPrompt() {
         OkHttpClient httpClient = new OkHttpClient();
         try {
             JSONObject part = new JSONObject();
-            part.put("text", "Tell me a mix of trivia and history at the nearest city at " + latitude + " " + longitude + " coordinates, if there's nothing interesting you can tell me a general mix for the location at the coordinates, respond only with a human type speech, that start with the name like the example Norrköping, Sweden : of max 100 words talking about the trivia and history, ALL IN ITALIAN EXCEPT THE NAME OF THE CITY AND THE NAME OF THE STATE");
+            part.put("text", "Genera un testo informativo in formato [Nome della città], [Paese] che includa:\n" +
+                    "\n" +
+                    "Una breve descrizione della località, menzionando eventuali caratteristiche geografiche rilevanti.\n" +
+                    "Una sezione storica che descriva brevemente la fondazione o eventi storici significativi legati alla località.\n" +
+                    "Una sezione \"Curiosità\" che presenti uno o due fatti interessanti o insoliti sulla località.\n" +
+                    "Utilizza le seguenti coordinate geografiche come riferimento per la località: " + latitude + ", " + longitude + "\n Rispondi solo con il testo informativo");
 
             JSONArray partsArray = new JSONArray();
             partsArray.put(part);
@@ -149,7 +73,7 @@ public class API {
                         String[] temp = firstPart.getString("text").split(":", 2);
                         place_name = temp[0];
                         getPlaceId();
-                        writtenSpeech = temp[0];
+                        writtenSpeech = temp[0] + temp[1];
                         //getSpeech(); toDo
                         return;
                     }
@@ -176,8 +100,6 @@ public class API {
 
             if (mp3.getStatus() == 200) {
                 spokenSpeech = new ByteArrayInputStream(mp3.getBody().readAllBytes());
-                /*Player player = new Player(bis);
-                player.play();*/
             } else {
                 System.out.println("Errore nella richiesta API: " + mp3.getStatus());
             }
@@ -202,8 +124,6 @@ public class API {
 
             if (!candidates.isEmpty()) {
                 place_id = candidates.getJSONObject(0).getString("place_id");
-                System.out.println(place_id);
-                System.out.println(place_name);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -215,10 +135,6 @@ public class API {
         try{
             OkHttpClient client = new OkHttpClient();
             String url = "https://maps.googleapis.com/maps/api/place/details/json?" + "place_id=" + place_id + "&fields=photos&key=" + MAPS_API_KEY;
-            System.out.println(url);
-            System.out.println(place_id);
-            System.out.println(place_name);
-
 
             Request request = new Request.Builder().url(url).build();
             Response response = client.newCall(request).execute();
