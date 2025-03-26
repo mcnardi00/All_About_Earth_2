@@ -85,6 +85,71 @@ public class API {
         }
     }
 
+    public void sendPrompt(String place) {
+        OkHttpClient httpClient = new OkHttpClient();
+        try {
+            JSONObject part = new JSONObject();
+            part.put("text", "Genera un testo informativo in formato [Nome della città], [Paese] che includa:\n" +
+                    "\n" +
+                    "Una breve descrizione della località, menzionando eventuali caratteristiche geografiche rilevanti.\n" +
+                    "Una sezione storica che descriva brevemente la fondazione o eventi storici significativi legati alla località.\n" +
+                    "Una sezione \"Curiosità\" che presenti uno o due fatti interessanti o insoliti sulla località.\n" +
+                    "Utilizza il seguente nome come riferimento per la località: " + place + "\n Rispondi solo con il testo informativo o con Il luogo inserito non è valido");
+
+            JSONArray partsArray = new JSONArray();
+            partsArray.put(part);
+
+            JSONObject content = new JSONObject();
+            content.put("parts", partsArray);
+
+            JSONArray contentsArray = new JSONArray();
+            contentsArray.put(content);
+
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("contents", contentsArray);
+
+            RequestBody body = RequestBody.create(
+                    MediaType.get("application/json; charset=utf-8"),
+                    requestBody.toString()
+            );
+
+            Request request = new Request.Builder()
+                    .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY)
+                    .post(body)
+                    .build();
+
+            try (Response response = httpClient.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    System.out.println("Errore nella richiesta: " + response.code());
+                }
+
+                assert response.body() != null;
+                String responseBody = response.body().string();
+                JSONObject jsonResponse = new JSONObject(responseBody);
+
+                //Parsing
+                JSONArray candidates = jsonResponse.optJSONArray("candidates");
+                if (candidates != null && !candidates.isEmpty()) {
+                    JSONObject firstCandidate = candidates.getJSONObject(0);
+                    JSONObject content0 = firstCandidate.getJSONObject("content");
+                    JSONArray parts = content0.getJSONArray("parts");
+                    if (!parts.isEmpty()) {
+                        JSONObject firstPart = parts.getJSONObject(0);
+                        String[] temp = firstPart.getString("text").split(":", 2);
+                        place_name = temp[0];
+                        getPlaceId();
+                        writtenSpeech = temp[0] + temp[1];
+                        //getSpeech(); toDo
+                        return;
+                    }
+                }
+                System.out.println("Nessuna risposta disponibile.");
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void getSpeech() {
 
         JSONObject json = new JSONObject();
