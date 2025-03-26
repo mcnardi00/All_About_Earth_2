@@ -134,10 +134,6 @@ public class Home extends Application {
         buttonBox = new HBox(10, randomPointer, searchButton); // 10 è il padding tra i bottoni
         buttonBox.setPadding(new Insets(0, 0, 20, 20));
 
-
-        buttonBox.setLayoutX(290);
-        buttonBox.setLayoutY(200);
-
         //Tasto sideBar
         Image sidebarImage = new Image("play2.png");
         ImageView sidebarView = new ImageView(sidebarImage);
@@ -200,11 +196,16 @@ public class Home extends Application {
             scene = new Scene(root, 1920, 1032, true);
             scene.setFill(Color.SILVER);
             scene.setCamera(camera);
+
+            //Todo:trovare le dimensioni giuste da dare al botton box
         }else{
             //Setto alla scena la camera
             scene = new Scene(root, WIDTH, HEIGHT, true);
             scene.setFill(Color.SILVER);
             scene.setCamera(camera);
+
+            buttonBox.setLayoutX(360);
+            buttonBox.setLayoutY(200);
         }
 
         //Gestisce il controllo del mouse e del click

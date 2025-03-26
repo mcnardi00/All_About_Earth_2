@@ -77,6 +77,7 @@ public class Illustration extends Application {
                         "\uD83C\uDF31 Studiare il nostro pianeta ci aiuta a preservarlo per il futuro."
         );*/
         api.sendPrompt();
+
         String formattedText = api.getWrittenSpeech().replace("**", "").replace("\n", "\n\n");
         Label text = new Label(formattedText);
         System.out.println(formattedText);
