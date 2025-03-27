@@ -7,7 +7,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -16,6 +15,12 @@ public class LocationsMenu extends Application {
     private VBox menuBox = new VBox(10); // Spaziatura tra i bottoni
 
     private HistoryManager historyManager = new HistoryManager();
+
+    private Stage locationStage;
+
+    public LocationsMenu(Stage locationStage){
+        this.locationStage = locationStage;
+    }
 
     @Override
     public void start(Stage stage) {
@@ -82,7 +87,7 @@ public class LocationsMenu extends Application {
                 ArrayList<Coordinate> coordinates = historyManager.readCoordinateFile();
                 Illustration illustration = new Illustration(new API(coordinates.get(locations.indexOf(location)).getWrittenSpeech(),coordinates.get(locations.indexOf(location)).getPlace_name(),coordinates.get(locations.indexOf(location)).getPlace_id()));
                 illustration.start(new Stage());
-                stage.close();
+                locationStage.close();
             });
 
             menuBox.getChildren().add(locationButton);
