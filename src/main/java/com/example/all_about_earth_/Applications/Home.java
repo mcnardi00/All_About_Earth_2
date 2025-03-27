@@ -84,11 +84,12 @@ public class Home extends Application {
 
     @Override
     public void start(Stage stage) {
-        Search search = new Search(this,homeStage,api);
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         screenWidth = screenBounds.getWidth();
         screenHeight = screenBounds.getHeight();
+
+        Search search = new Search(this,homeStage,api, screenWidth, screenHeight);
 
         //Setto la camera e la sua visuale
         Camera camera = new PerspectiveCamera(true);
@@ -143,12 +144,10 @@ public class Home extends Application {
         sidebarView.setPreserveRatio(true);
         sidebarButton.setMaxSize(50, 50);
         sidebarButton.setGraphic(sidebarView);
-        //sidebarButton.setStyle("-fx-background-color: white; -fx-border-color: transparent; -fx-padding: 0;");
+        sidebarButton.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; ");
 
         //Hbox della sideBar
         HBox sidebarBox = new HBox(sidebarButton);
-        sidebarBox.setLayoutX(-430);
-        sidebarBox.setLayoutY(0);
 
         //Fornisce lo stile ai bottoni
         setButtonStyle();
@@ -193,11 +192,17 @@ public class Home extends Application {
 
         if(screenHeight == 1032.0 && screenWidth == 1920.0){
             //Setto alla scena la camera
-            scene = new Scene(root, 1920, 1032, true);
+            scene = new Scene(root, screenWidth, screenHeight, true);
             scene.setFill(Color.SILVER);
             scene.setCamera(camera);
 
-            //Todo:trovare le dimensioni giuste da dare al botton box
+            //Disposizione bottoni per scelta
+            buttonBox.setLayoutX(380);
+            buttonBox.setLayoutY(200);
+
+            //Disposizione bottoni per sidebar
+            sidebarBox.setLayoutX(-500);
+            sidebarBox.setLayoutY(0);
         }else{
             //Setto alla scena la camera
             scene = new Scene(root, WIDTH, HEIGHT, true);
@@ -211,10 +216,8 @@ public class Home extends Application {
         //Gestisce il controllo del mouse e del click
         initMouseControl(world, scene,homeStage);
 
-        //scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         homeStage.setTitle("All About Places");
         homeStage.setScene(scene);
-        //homeStage.setMaximized(true);
 
         homeStage.show();
 
@@ -234,8 +237,8 @@ public class Home extends Application {
 
         sideBox.getChildren().addAll(settings, history);
         setSideButtonStyle();
-        sideBox.setLayoutY(-100);
-        sideBox.setLayoutX(-380);
+        sideBox.setLayoutY(-80);
+        sideBox.setLayoutX(-440);
 
         return sideBox;
     }

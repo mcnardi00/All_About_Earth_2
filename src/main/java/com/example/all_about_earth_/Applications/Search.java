@@ -18,10 +18,15 @@ public class Search extends Application {
     private Stage searchStage = new Stage();
     private API api;
 
-    public Search(Home home, Stage stage, API api){
+    private double screenWidth;
+    private double screenEight;
+
+    public Search(Home home, Stage stage, API api, double screenWidth, double screenEight){
         this.home = home;
         homeStage = stage;
         this.api = api;
+        this.screenWidth = screenWidth;
+        this.screenEight = screenEight;
     }
 
     private TextField searchField = new TextField();
@@ -91,13 +96,21 @@ public class Search extends Application {
         searchStage.setScene(scene);
         searchStage.setMaxWidth(200);
         searchStage.setMaxHeight(300);
-        searchStage.setX(1175);
-        searchStage.setY(650);
+
+        //Grandezza computer scuola
+        if(screenWidth == 1920.0 && screenEight == 1032.0){
+            searchStage.setX(1700);
+            searchStage.setY(650);
+        }else{      //Todo: aggiungere l'if per grandezza 1920x1080
+            searchStage.setX(1175);
+            searchStage.setY(650);
+        }
+
 
         searchStage.setResizable(false);
         searchStage.initModality(Modality.APPLICATION_MODAL);
 
-        searchStage.show();
+        searchStage.showAndWait();
     }
 
 }
