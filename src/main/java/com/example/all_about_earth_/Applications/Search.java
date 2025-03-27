@@ -21,6 +21,8 @@ public class Search extends Application {
     private double screenWidth;
     private double screenEight;
 
+    private boolean isOpened = false;
+
     public Search(Home home, Stage stage, API api, double screenWidth, double screenEight){
         this.home = home;
         homeStage = stage;
@@ -28,6 +30,8 @@ public class Search extends Application {
         this.screenWidth = screenWidth;
         this.screenEight = screenEight;
     }
+
+    public Search(){}
 
     private TextField searchField = new TextField();
 
@@ -113,8 +117,14 @@ public class Search extends Application {
             searchStage.initModality(Modality.APPLICATION_MODAL);
         }
 
+        try{
+            searchStage.showAndWait();
+        }catch(Exception e){
+        }
 
-        searchStage.showAndWait();
     }
 
+    public void setIsOpened(boolean isOpened){
+        this.isOpened = isOpened;
+    }
 }

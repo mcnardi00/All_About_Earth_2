@@ -42,6 +42,8 @@ public class Illustration extends Application {
 
     private API api;
 
+    private boolean isOpened = false;
+
     public Illustration(API api){
         this.api = api;
     }
@@ -80,7 +82,11 @@ public class Illustration extends Application {
         borderPane.setTop(titleBox);
 
         // **Testo descrittivo con box trasparente**
-        api.sendPrompt();
+        if(!api.sendPrompt()){
+            home.start(new Stage());
+            stage.close();
+            return;
+        }
 
         String formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ","").trim();
         Label text = new Label(formattedText);
@@ -90,11 +96,11 @@ public class Illustration extends Application {
         text.setWrapText(true);
 
         if(screenHeight == 1032.0 && screenWidth == 1920.0){
-            text.setMaxWidth(800);
+            text.setMaxWidth(900);
             text.setMaxHeight(700);
         }else{
             text.setMaxWidth(600);
-            text.setMaxHeight(500);
+            text.setMaxHeight(600);
         }
 
         text.setPadding(new Insets(25));
@@ -102,14 +108,20 @@ public class Illustration extends Application {
         text.setWrapText(true);
 
         photoUrls = api.getPlacePhotos();
-        imageView.setImage(new Image(photoUrls[0]));
+
+        if(isOpened){
+            home.start(new Stage());
+            stage.close();
+        }else{
+            imageView.setImage(new Image(photoUrls[0]));
+        }
 
         if(screenHeight == 1032.0 && screenWidth == 1920.0){
             imageView.setFitWidth(1050);
             imageView.setFitHeight(700);
         }else{
-            imageView.setFitWidth(850);
-            imageView.setFitHeight(500);
+            imageView.setFitWidth(700);
+            imageView.setFitHeight(600);
         }
 
         imageView.setStyle("-fx-padding: 3;");
@@ -266,6 +278,9 @@ public class Illustration extends Application {
     }
 
 
+    public void setIsOpened(boolean isOpened){
+        this.isOpened = isOpened;
+    }
 
     public static void main(String[] args) {
         launch(args);

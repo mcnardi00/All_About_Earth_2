@@ -23,7 +23,7 @@ public class Error extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage){
         //Configura il nuovo stage per il messaggio di errore
         stage.setTitle("Errore");
 
