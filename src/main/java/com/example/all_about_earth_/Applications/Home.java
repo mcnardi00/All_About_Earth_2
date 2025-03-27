@@ -211,6 +211,9 @@ public class Home extends Application {
 
             buttonBox.setLayoutX(360);
             buttonBox.setLayoutY(200);
+
+            sidebarBox.setLayoutX(-510);
+            sidebarBox.setLayoutY(0);
         }
 
         //Gestisce il controllo del mouse e del click
@@ -480,26 +483,36 @@ public class Home extends Application {
         Point3D pickPoint = pickResult.getIntersectedPoint();
         if (pickPoint == null) return;
 
+        // Normalizza le coordinate per ottenere latitudine e longitudine
         double normX = pickPoint.getX() / sphere.getRadius();
         double normY = pickPoint.getY() / sphere.getRadius();
         double normZ = pickPoint.getZ() / sphere.getRadius();
 
         double latitude = Math.toDegrees(Math.asin(normY));
+
+        // La longitudine potrebbe avere bisogno di una trasformazione extra
         double rawLongitude = Math.toDegrees(Math.atan2(normZ, normX));
-        double correctedLongitude = rawLongitude + angleY.get();
+
+        // Compensa la rotazione della sfera
+        double correctedLongitude = rawLongitude - angleY.get();
         correctedLongitude = ((correctedLongitude + 180) % 360 + 360) % 360 - 180;
 
-        api.setLatitude(latitude);
-        api.setLongitude(correctedLongitude);
+        // Controlla se le coordinate vengono effettivamente calcolate
         System.out.printf("Cliccato su Lat: %.2f, Lon: %.2f%n", latitude, correctedLongitude);
 
+        // Invia le coordinate all'API
+        api.setLatitude(latitude);
+        api.setLongitude(correctedLongitude);
+
+        // Apri la finestra con i dati del luogo cliccato
         Illustration illustration = new Illustration(api);
         illustration.start(new Stage());
         homeStage.close();
 
-        //Se sta routando la ferma
+        // Ferma la rotazione della sfera
         isRotating = !isRotating;
     }
+
 
     public void setTextFromSearch(String string){
         textFromSearch = string;

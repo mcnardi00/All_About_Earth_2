@@ -102,7 +102,7 @@ public class Search extends Application {
             searchStage.setX(1700);
             searchStage.setY(650);
         }else{      //Todo: aggiungere l'if per grandezza 1920x1080
-            searchStage.setX(1175);
+            searchStage.setX(1300);
             searchStage.setY(650);
         }
 
