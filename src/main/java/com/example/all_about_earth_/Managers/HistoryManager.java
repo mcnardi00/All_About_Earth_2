@@ -21,8 +21,8 @@ public class HistoryManager {
 
                 //User e coordinate di default
                 User user = new User("Utente","prova");
-                Coordinate coordinata = new Coordinate();
-                coordinate.add(coordinata);
+                //Coordinate coordinata = new Coordinate();
+                //coordinate.add(coordinata);
 
                 Data data1 = new Data(coordinate, user);
                 data.add(data1);

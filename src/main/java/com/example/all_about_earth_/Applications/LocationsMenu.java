@@ -4,77 +4,77 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-//todo: leggere da file i menu disponibili
 public class LocationsMenu extends Application {
-    // Creazione della finestra pop-up con VBox
-    VBox menuBox = new VBox();
+    VBox menuBox = new VBox(10); // Spaziatura tra i bottoni
 
     @Override
-    public void start(Stage stage){
-
+    public void start(Stage stage) {
         showHistory();
 
-        // Creazione di una finestra di popup personalizzata
-        Scene scene = new Scene(menuBox,200,300);
+        Scene scene = new Scene(menuBox, 220, 320);
 
         stage.setScene(scene);
-        stage.setMaxWidth(200);
-        stage.setMaxHeight(300);
+        stage.setMaxWidth(220);
+        stage.setMaxHeight(320);
         stage.setResizable(false);
+        //stage.initModality(Modality.APPLICATION_MODAL);
 
         stage.show();
     }
 
     public void showHistory() {
-        // Simulazione della cronologia delle ricerche
         String[] locations = {"Milano", "Roma", "Firenze", "Napoli", "Torino"};
 
         menuBox.setStyle(
-                "-fx-background-color: rgba(255, 255, 255, 0.95); " +
+                "-fx-background-color: #1a1a1a; " + // Sfondo nero
                         "-fx-border-radius: 15px; " +
-                        "-fx-padding: 10px; " +
-                        "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 2, 2);"
+                        "-fx-padding: 15px; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.2), 12, 0, 2, 2);"
         );
 
         for (String location : locations) {
             Button locationButton = new Button(location);
-
-            // Stile dei bottoni
+            locationButton.setPrefWidth(180);
             locationButton.setStyle(
-                    "-fx-background-color: transparent; " +
-                            "-fx-padding: 10px 20px; " +
-                            "-fx-font-size: 16px; " +
-                            "-fx-font-family: 'Segoe UI'; " +
-                            "-fx-text-fill: #2C3E50; " +
-                            "-fx-alignment: center-left;"
+                    "-fx-background-color: #2c3e50; " + // Blu scuro per visibilità
+                            "-fx-border-color: #ffffff; " + // Bordo bianco
+                            "-fx-border-width: 1px; " +
+                            "-fx-border-radius: 8px; " +
+                            "-fx-padding: 12px; " +
+                            "-fx-font-size: 14px; " +
+                            "-fx-font-family: 'Arial'; " +
+                            "-fx-text-fill: #ffffff; " + // Testo bianco per contrasto
+                            "-fx-alignment: center;"
             );
 
-            // Effetto hover
             locationButton.setOnMouseEntered(e -> locationButton.setStyle(
-                    "-fx-background-color: #3498DB; " +
+                    "-fx-background-color: #3498DB; " + // Blu acceso per hover
+                            "-fx-border-radius: 8px; " +
+                            "-fx-padding: 12px; " +
+                            "-fx-font-size: 14px; " +
+                            "-fx-font-family: 'Arial'; " +
                             "-fx-text-fill: white; " +
-                            "-fx-padding: 10px 20px; " +
-                            "-fx-font-size: 16px; " +
-                            "-fx-font-family: 'Segoe UI';"
+                            "-fx-transition: all 0.3s ease;"
             ));
 
             locationButton.setOnMouseExited(e -> locationButton.setStyle(
-                    "-fx-background-color: transparent; " +
-                            "-fx-padding: 10px 20px; " +
-                            "-fx-font-size: 16px; " +
-                            "-fx-font-family: 'Segoe UI'; " +
-                            "-fx-text-fill: #2C3E50;"
+                    "-fx-background-color: #2c3e50; " + // Ritorna al blu scuro
+                            "-fx-border-color: #ffffff; " +
+                            "-fx-border-width: 1px; " +
+                            "-fx-border-radius: 8px; " +
+                            "-fx-padding: 12px; " +
+                            "-fx-font-size: 14px; " +
+                            "-fx-font-family: 'Arial'; " +
+                            "-fx-text-fill: #ffffff;"
             ));
 
-            // Azione quando si seleziona una città
-            locationButton.setOnAction(e -> {
-                System.out.println("Hai selezionato " + location);
-            });
+            locationButton.setOnAction(e -> System.out.println("Hai selezionato " + location));
 
             menuBox.getChildren().add(locationButton);
         }
-
     }
+
 }

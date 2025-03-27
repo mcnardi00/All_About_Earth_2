@@ -13,6 +13,7 @@ import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
@@ -25,6 +26,9 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+
+import java.security.SecureRandom;
+import java.util.Random;
 
 public class Home extends Application {
 
@@ -49,7 +53,6 @@ public class Home extends Application {
     //Dimensioni schermo
     private static final float WIDTH = 1500;
     private static final float HEIGHT = 1200;
-
     private double screenWidth;
     private double screenHeight;
 
@@ -74,7 +77,7 @@ public class Home extends Application {
 
     private Scene scene;
 
-    private String textFromSearch;
+    private SecureRandom secureRandom = new SecureRandom();
 
     public Home(Stage stage){
         homeStage = stage;
@@ -114,6 +117,22 @@ public class Home extends Application {
         randomView.setPreserveRatio(true);
         randomPointer.setMaxSize(40, 40);
         randomPointer.setGraphic(randomView);
+
+        //Estrae un punto random e lo cerca
+        randomPointer.setOnAction(e->{
+            double[] coordinates = extractCordinates();
+
+            double longitudine = coordinates[0];
+            double latitudine = coordinates[1];
+
+            api.setLongitude(longitudine);
+            api.setLongitude(latitudine);
+
+            // Apri la finestra con i dati del luogo cliccato
+            Illustration illustration = new Illustration(api);
+            illustration.start(new Stage());
+            homeStage.close();
+        });
 
         //Tasto ricerca
         Image searchImage = new Image("lente.png");
@@ -182,7 +201,6 @@ public class Home extends Application {
                 history.setOnAction(event-> {
                     LocationsMenu locationsMenu = new LocationsMenu();
                     locationsMenu.start(stage);
-                    homeStage.close();
                 });
 
                 isClicked = true;
@@ -227,7 +245,6 @@ public class Home extends Application {
         //Prepara l'animazione della terra che ruota
         prepareAnimation();
     }
-
 
     //Crea la sidebar e i suoi bottoni
     public VBox createSidebar() {
@@ -423,7 +440,7 @@ public class Home extends Application {
     }
 
     //Gestisce il click della terra e prende le coordinate
-    private void handleEarthClick(javafx.scene.input.MouseEvent event) {
+    private void handleEarthClick(MouseEvent event) {
         PickResult pickResult = event.getPickResult();
         if (pickResult == null || pickResult.getIntersectedNode() != sphere) {
             return;
@@ -472,31 +489,6 @@ public class Home extends Application {
         return new double[]{latitude, longitude};
     }
 
-    // Metodo opzionale per test e debug
-    private void testCoordinateConversion() {
-        // Alcuni punti di riferimento noti
-        double[][] testLocations = {
-                {0, 0},        // Greenwich
-                {40.7128, -74.0060},   // New York
-                {-33.8688, 151.2093},  // Sydney
-                {35.6762, 139.6503},   // Tokyo
-                {-22.9068, -43.1729}   // Rio de Janeiro
-        };
-
-        for (double[] location : testLocations) {
-            // Converti coordinate geografiche in punto sulla sfera
-            Point3D spherePoint = geographicToSphereCoordinates(location[0], location[1]);
-
-            // Converti il punto sulla sfera nuovamente in coordinate geografiche
-            double[] convertedCoords = sphereCoordinatesToGeographic(spherePoint);
-
-            System.out.printf("Originale: (%.4f, %.4f) -> Convertito: (%.4f, %.4f)%n",
-                    location[0], location[1],
-                    convertedCoords[0], convertedCoords[1]
-            );
-        }
-    }
-
     // Metodo ausiliario per convertire coordinate geografiche in punto sulla sfera
     private Point3D geographicToSphereCoordinates(double latitude, double longitude) {
         double radius = sphere.getRadius();
@@ -512,9 +504,16 @@ public class Home extends Application {
         return new Point3D(x, y, z);
     }
 
+    public double[] extractCordinates(){
+        double [] coordinates = new double[2];
 
-    public void setTextFromSearch(String string){
-        textFromSearch = string;
+        double lon = secureRandom.nextDouble(-180,180);
+        coordinates[0] = lon;
+
+        double lat = secureRandom.nextDouble(-90,90);
+        coordinates[1] = lat;
+
+        return coordinates;
     }
 
 }
