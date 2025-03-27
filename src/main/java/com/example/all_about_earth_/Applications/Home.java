@@ -483,26 +483,17 @@ public class Home extends Application {
         Point3D pickPoint = pickResult.getIntersectedPoint();
         if (pickPoint == null) return;
 
-        // Normalizza le coordinate per ottenere latitudine e longitudine
-        double normX = pickPoint.getX() / sphere.getRadius();
-        double normY = pickPoint.getY() / sphere.getRadius();
-        double normZ = pickPoint.getZ() / sphere.getRadius();
+        // Converti il punto cliccato nelle coordinate geografiche
+        double[] coordinates = sphereCoordinatesToGeographic(pickPoint);
 
-        double latitude = Math.toDegrees(Math.asin(normY));
+        double latitude = coordinates[0];
+        double longitude = coordinates[1];
 
-        // La longitudine potrebbe avere bisogno di una trasformazione extra
-        double rawLongitude = Math.toDegrees(Math.atan2(normZ, normX));
-
-        // Compensa la rotazione della sfera
-        double correctedLongitude = rawLongitude - angleY.get();
-        correctedLongitude = ((correctedLongitude + 180) % 360 + 360) % 360 - 180;
-
-        // Controlla se le coordinate vengono effettivamente calcolate
-        System.out.printf("Cliccato su Lat: %.2f, Lon: %.2f%n", latitude, correctedLongitude);
+        System.out.printf("Coordinate precise - Latitudine: %.4f, Longitudine: %.4f%n", latitude, longitude);
 
         // Invia le coordinate all'API
         api.setLatitude(latitude);
-        api.setLongitude(correctedLongitude);
+        api.setLongitude(longitude);
 
         // Apri la finestra con i dati del luogo cliccato
         Illustration illustration = new Illustration(api);
@@ -511,6 +502,65 @@ public class Home extends Application {
 
         // Ferma la rotazione della sfera
         isRotating = !isRotating;
+    }
+
+    private double[] sphereCoordinatesToGeographic(Point3D point) {
+        double radius = sphere.getRadius();
+
+        double x = point.getX();
+        double y = point.getY();
+        double z = point.getZ();
+
+        // Calcolo della latitudine
+        double latitude = -Math.toDegrees(Math.asin(y / radius));
+
+        // Calcolo della longitudine
+        double longitude = Math.toDegrees(Math.atan2(x, -z));
+
+        // Normalizzazione della longitudine
+        longitude = ((longitude + 180) % 360 + 360) % 360 - 180;
+
+        return new double[]{latitude, longitude};
+    }
+
+    // Metodo opzionale per test e debug
+    private void testCoordinateConversion() {
+        // Alcuni punti di riferimento noti
+        double[][] testLocations = {
+                {0, 0},        // Greenwich
+                {40.7128, -74.0060},   // New York
+                {-33.8688, 151.2093},  // Sydney
+                {35.6762, 139.6503},   // Tokyo
+                {-22.9068, -43.1729}   // Rio de Janeiro
+        };
+
+        for (double[] location : testLocations) {
+            // Converti coordinate geografiche in punto sulla sfera
+            Point3D spherePoint = geographicToSphereCoordinates(location[0], location[1]);
+
+            // Converti il punto sulla sfera nuovamente in coordinate geografiche
+            double[] convertedCoords = sphereCoordinatesToGeographic(spherePoint);
+
+            System.out.printf("Originale: (%.4f, %.4f) -> Convertito: (%.4f, %.4f)%n",
+                    location[0], location[1],
+                    convertedCoords[0], convertedCoords[1]
+            );
+        }
+    }
+
+    // Metodo ausiliario per convertire coordinate geografiche in punto sulla sfera
+    private Point3D geographicToSphereCoordinates(double latitude, double longitude) {
+        double radius = sphere.getRadius();
+
+        // Conversione coordinate geografiche in coordinate cartesiane
+        double phi = Math.toRadians(latitude);
+        double theta = Math.toRadians(longitude);
+
+        double x = radius * Math.cos(phi) * Math.sin(theta);
+        double y = -radius * Math.sin(phi);  // Negativo per allineare correttamente
+        double z = -radius * Math.cos(phi) * Math.cos(theta);
+
+        return new Point3D(x, y, z);
     }
 
 
