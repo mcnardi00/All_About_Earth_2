@@ -13,6 +13,10 @@ public class Data implements Serializable {
         this.user = user;
     }
 
+    public Data(User user){
+        this.user = user;
+    }
+
     public ArrayList<Coordinate> getCoordinate() {
         return coordinate;
     }

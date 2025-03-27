@@ -383,4 +383,12 @@ public class API {
     public void setPlaceFound(boolean placeFound) {
         this.placeFound = placeFound;
     }
+
+    public String getPlace_id() {
+        return place_id;
+    }
+
+    public void setPlace_id(String place_id) {
+        this.place_id = place_id;
+    }
 }

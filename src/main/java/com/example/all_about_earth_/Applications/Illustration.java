@@ -1,6 +1,10 @@
 package com.example.all_about_earth_.Applications;
 
 import com.example.all_about_earth_.API.API;
+import com.example.all_about_earth_.Managers.ActualUserManager;
+import com.example.all_about_earth_.Object.Coordinate;
+import com.example.all_about_earth_.Object.Data;
+import com.example.all_about_earth_.Object.User;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -28,6 +32,8 @@ import javazoom.jl.player.Player;
 
 public class Illustration extends Application {
     private final Home home = new Home(new Stage());
+    private ActualUserManager actualUserManager = new ActualUserManager();
+    private API api;
 
     private final BorderPane borderPane = new BorderPane();
     private final StackPane generalPane = new StackPane();
@@ -40,14 +46,6 @@ public class Illustration extends Application {
 
     private final Button getBackButton = new Button();
 
-    private API api;
-
-    public Illustration(API api){
-        this.api = api;
-    }
-
-    public Illustration(){}
-
     private final ImageView imageView = new ImageView();
     private int currentImageIndex = 0;
     private String[] photoUrls;
@@ -56,6 +54,12 @@ public class Illustration extends Application {
     private double screenHeight;
 
     private boolean ExceptionOpened = false;
+
+    public Illustration(API api){
+        this.api = api;
+    }
+
+    public Illustration(){}
 
     @Override
     public void start(Stage stage) {
@@ -124,6 +128,15 @@ public class Illustration extends Application {
         imageAndText.getChildren().addAll(imageView, text);
         imageAndText.setAlignment(Pos.CENTER);
         borderPane.setCenter(imageAndText);
+
+        User user = actualUserManager.readFile();
+        Data data = new Data(user);
+
+        //Salvo su file
+        Coordinate coordinate = new Coordinate(api.getWrittenSpeech(), api.getPlace_id(), api.getPlace_name());
+
+
+
 
         //Bottone audio
         Image icon = new Image("audio.png");
