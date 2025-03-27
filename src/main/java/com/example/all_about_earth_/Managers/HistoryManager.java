@@ -21,15 +21,6 @@ public class HistoryManager {
                 FileOutputStream fos = new FileOutputStream(f);
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-                //User e coordinate di default
-                User user = new User("Utente","prova");
-
-                Data data1 = new Data(null, user);
-                data.add(data1);
-
-                oos.writeObject(data);
-                oos.flush();
-
                 fos.close();
                 oos.close();
             }
@@ -55,43 +46,88 @@ public class HistoryManager {
 
 
     public ArrayList<Coordinate> readCoordinateFile(){
-        try {
-            FileInputStream fis = new FileInputStream(f);
-            ObjectInputStream ois = new ObjectInputStream(fis);
+        data = readFile();
 
-            User user = getActualUser();
+        User user = getActualUser();
 
-            data = (ArrayList<Data>) ois.readObject();
-
-            for(Data checkData : data){
-                if(checkData.getUser().getEmail().equals(user.getEmail()) && checkData.getUser().getPsw().equals(user.getPsw())){
-                    return checkData.getCoordinate();
-                }
+        for (Data checkData : data) {
+            if (checkData.getUser().getEmail().equals(user.getEmail()) && checkData.getUser().getPsw().equals(user.getPsw())) {
+                return checkData.getCoordinate();
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException ignored) {
         }
         return null;
     }
 
-    public boolean AddNewPlace(Coordinate coordinate){
-        ArrayList<Coordinate> coordinates = readCoordinateFile();
+    public ArrayList<String> readLocations(){
+        ArrayList<String> locations = new ArrayList<>();
+        readFile();
 
-        for(Coordinate checkCoordinate : coordinates){
-            if(checkCoordinate.getPlace_id() == coordinate.getPlace_id()){
-                isAldreadyAdded = true;
-                return false;
+        User user = getActualUser();
+
+        try{
+            for (Data checkData : data) {
+                if (checkData.getUser().getEmail().equals(user.getEmail()) && checkData.getUser().getPsw().equals(user.getPsw())) {
+                    for(Coordinate coordinate1 : checkData.getCoordinate()){
+                        locations.add(coordinate1.getPlace_name());
+                    }
+                }
             }
+        }catch (Exception e){
         }
 
-        if(!isAldreadyAdded){
-            coordinates.add(coordinate);
+
+        return locations;
+    }
+
+    public boolean AddNewPlace(Coordinate coordinate1){
+
+        coordinate = readCoordinateFile();
+
+        //Se non è il primo luogo controlla che non ci sia già
+        if(!coordinate.isEmpty()){
+            coordinate = readCoordinateFile();
+
+            for(Coordinate checkCoordinate : coordinate){
+                if(checkCoordinate.getPlace_id() == coordinate1.getPlace_id()){
+                    isAldreadyAdded = true;
+                    return false;
+                }
+            }
+
+            if(!isAldreadyAdded){
+                coordinate.add(coordinate1);
+                addCoordinateInData(coordinate);
+                writeFile();
+                return true;
+            }
+        }else{      //Se è il primo luogo lo inserisce direttamente
+            coordinate.add(coordinate1);
+            addCoordinateInData(coordinate);
+            writeFile();
             return true;
         }
 
         return false;
+    }
+
+    public void addCoordinateInData(ArrayList<Coordinate> coordinate){
+        User user = getActualUser();
+
+        try{
+            if(!data.isEmpty()){
+                data = readFile();
+                for (Data checkData : data) {
+                    if (checkData.getUser().getEmail().equals(user.getEmail()) && checkData.getUser().getPsw().equals(user.getPsw())) {
+                        checkData.setCoordinate(coordinate);
+                    }
+                }
+            }else{
+                Data data1 = new Data(coordinate,user);
+                data.add(data1);
+            }
+
+        }catch (Exception e){
+        }
     }
 
 

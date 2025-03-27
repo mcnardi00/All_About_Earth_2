@@ -2,6 +2,7 @@ package com.example.all_about_earth_.Login;
 
 import com.example.all_about_earth_.Applications.Home;
 import com.example.all_about_earth_.Managers.ActualUserManager;
+import com.example.all_about_earth_.Managers.HistoryManager;
 import com.example.all_about_earth_.Managers.LoginManager;
 import com.example.all_about_earth_.Object.User;
 import javafx.application.Application;
@@ -143,6 +144,9 @@ public class Login extends Application {
 
         ActualUserManager actualUserManager = new ActualUserManager();
         actualUserManager.createFile();
+
+        HistoryManager historyManager = new HistoryManager();
+        historyManager.createFile();
 
         launch(args);
     }

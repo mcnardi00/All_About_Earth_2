@@ -2,6 +2,7 @@ package com.example.all_about_earth_.Applications;
 
 import com.example.all_about_earth_.API.API;
 import com.example.all_about_earth_.Managers.ActualUserManager;
+import com.example.all_about_earth_.Managers.HistoryManager;
 import com.example.all_about_earth_.Object.Coordinate;
 import com.example.all_about_earth_.Object.Data;
 import com.example.all_about_earth_.Object.User;
@@ -33,6 +34,7 @@ import javazoom.jl.player.Player;
 public class Illustration extends Application {
     private final Home home = new Home(new Stage());
     private ActualUserManager actualUserManager = new ActualUserManager();
+    private HistoryManager historyManager = new HistoryManager();
     private API api;
 
     private final BorderPane borderPane = new BorderPane();
@@ -111,6 +113,8 @@ public class Illustration extends Application {
 
         if(!api.isExceptionOpened()){
             photoUrls = api.getPlacePhotos();
+
+            //Todo:risolvere bug ogni tanto exception
             imageView.setImage(new Image(photoUrls[0]));
         }
         
@@ -129,14 +133,9 @@ public class Illustration extends Application {
         imageAndText.setAlignment(Pos.CENTER);
         borderPane.setCenter(imageAndText);
 
-        User user = actualUserManager.readFile();
-        Data data = new Data(user);
-
         //Salvo su file
         Coordinate coordinate = new Coordinate(api.getWrittenSpeech(), api.getPlace_id(), api.getPlace_name());
-
-
-
+        historyManager.AddNewPlace(coordinate);
 
         //Bottone audio
         Image icon = new Image("audio.png");

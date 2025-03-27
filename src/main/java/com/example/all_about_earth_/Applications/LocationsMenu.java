@@ -1,5 +1,6 @@
 package com.example.all_about_earth_.Applications;
 
+import com.example.all_about_earth_.Managers.HistoryManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,8 +8,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class LocationsMenu extends Application {
-    VBox menuBox = new VBox(10); // Spaziatura tra i bottoni
+    private VBox menuBox = new VBox(10); // Spaziatura tra i bottoni
+
+    private HistoryManager historyManager = new HistoryManager();
 
     @Override
     public void start(Stage stage) {
@@ -26,7 +31,7 @@ public class LocationsMenu extends Application {
     }
 
     public void showHistory() {
-        String[] locations = {"Milano", "Roma", "Firenze", "Napoli", "Torino"};
+        ArrayList<String> locations = historyManager.readLocations();
 
         menuBox.setStyle(
                 "-fx-background-color: #1a1a1a; " + // Sfondo nero

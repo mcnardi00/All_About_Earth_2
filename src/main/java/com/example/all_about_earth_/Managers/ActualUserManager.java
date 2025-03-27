@@ -11,7 +11,8 @@ public class ActualUserManager {
 
     public void createFile(){
         try {
-            if(!f.createNewFile()){
+            if(!f.exists()){
+                f.createNewFile();
                 FileOutputStream fos = new FileOutputStream(f);
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
 
