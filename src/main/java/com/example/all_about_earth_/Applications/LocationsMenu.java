@@ -15,6 +15,8 @@ public class LocationsMenu extends Application {
 
     private HistoryManager historyManager = new HistoryManager();
 
+    private String placeName;
+
     @Override
     public void start(Stage stage) {
         showHistory();
@@ -30,6 +32,7 @@ public class LocationsMenu extends Application {
         stage.show();
     }
 
+    //todo:sistemare che se è vuoto stampa che è vuoto
     public void showHistory() {
         ArrayList<String> locations = historyManager.readLocations();
 
@@ -76,7 +79,9 @@ public class LocationsMenu extends Application {
                             "-fx-text-fill: #ffffff;"
             ));
 
-            locationButton.setOnAction(e -> System.out.println("Hai selezionato " + location));
+
+            //Todo: Far aprire illustration locationButton.setOnAction(e -> {});
+
 
             menuBox.getChildren().add(locationButton);
         }
