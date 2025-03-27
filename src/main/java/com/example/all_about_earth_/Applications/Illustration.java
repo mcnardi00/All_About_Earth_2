@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -19,6 +20,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javazoom.jl.decoder.JavaLayerException;
@@ -48,6 +50,9 @@ public class Illustration extends Application {
     private int currentImageIndex = 0;
     private String[] photoUrls;
 
+    private double screenWidth;
+    private double screenHeight;
+
     @Override
     public void start(Stage stage) {
         // **Sfondo con immagine**
@@ -58,6 +63,10 @@ public class Illustration extends Application {
                 BackgroundPosition.CENTER,
                 new BackgroundSize(100, 100, true, true, true, true));
         generalPane.setBackground(new Background(background));
+
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        screenWidth = screenBounds.getWidth();
+        screenHeight = screenBounds.getHeight();
 
         // **Titolo moderno**
         Label title = new Label("All About Earth");
@@ -79,16 +88,30 @@ public class Illustration extends Application {
         text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 18));
         text.setTextFill(Color.WHITE);
         text.setWrapText(true);
-        text.setMaxWidth(800);
-        text.setMaxHeight(700);
+
+        if(screenHeight == 1032.0 && screenWidth == 1920.0){
+            text.setMaxWidth(800);
+            text.setMaxHeight(700);
+        }else{
+            text.setMaxWidth(600);
+            text.setMaxHeight(500);
+        }
+
         text.setPadding(new Insets(25));
         text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px; -fx-border-color: white; -fx-border-width: 2px; -fx-alignment: center;");
         text.setWrapText(true);
 
         photoUrls = api.getPlacePhotos();
         imageView.setImage(new Image(photoUrls[0]));
-        imageView.setFitWidth(1050);
-        imageView.setFitHeight(700);
+
+        if(screenHeight == 1032.0 && screenWidth == 1920.0){
+            imageView.setFitWidth(1050);
+            imageView.setFitHeight(700);
+        }else{
+            imageView.setFitWidth(850);
+            imageView.setFitHeight(500);
+        }
+
         imageView.setStyle("-fx-padding: 3;");
 
         //Contenitore immagine e testo
@@ -153,7 +176,7 @@ public class Illustration extends Application {
         borderPane.setBottom(bottomLayout);
         generalPane.getChildren().add(borderPane);
 
-        Scene scene = new Scene(generalPane, 1500, 1200);
+        Scene scene = new Scene(generalPane, screenWidth, screenHeight);
         stage.setScene(scene);
         stage.setTitle("All About Earth 🌍");
         stage.setMaximized(true);

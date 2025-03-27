@@ -205,7 +205,7 @@ public class Home extends Application {
             sidebarBox.setLayoutY(0);
         }else{
             //Setto alla scena la camera
-            scene = new Scene(root, WIDTH, HEIGHT, true);
+            scene = new Scene(root, screenWidth, screenHeight, true);
             scene.setFill(Color.SILVER);
             scene.setCamera(camera);
 
