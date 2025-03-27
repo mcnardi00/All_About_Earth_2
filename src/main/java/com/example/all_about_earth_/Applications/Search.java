@@ -76,7 +76,7 @@ public class Search extends Application {
             //Se il testo non è vuoto invio il testo e apro lo stage
             if(!text.isEmpty()){
                 //home.setTextFromSearch(text);
-                api.sendPrompt(text.trim());
+                api.getCityByText(text.trim());
                 Illustration illustration = new Illustration(api);
                 illustration.start(new Stage());
                 searchStage.close();
