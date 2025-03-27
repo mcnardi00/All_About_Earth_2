@@ -1,7 +1,9 @@
 package com.example.all_about_earth_.API;
 
+import com.example.all_about_earth_.Applications.Error;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import javafx.stage.Stage;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -56,6 +58,8 @@ public class API {
             try (Response response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     System.out.println("Errore nella richiesta: " + response.code());
+                    Error error = new Error("Errore nella richiesta");
+                    error.start(new Stage());
                 }
 
                 assert response.body() != null;
@@ -78,7 +82,8 @@ public class API {
                         return;
                     }
                 }
-                System.out.println("Nessuna risposta disponibile.");
+                Error error = new Error("Nessuna risposta disponibile.");
+                error.start(new Stage());
             }
         }catch (Exception e) {}
     }
@@ -119,6 +124,8 @@ public class API {
             try (Response response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     System.out.println("Errore nella richiesta: " + response.code());
+                    Error error = new Error("Errore nella richiesta");
+                    error.start(new Stage());
                 }
 
                 assert response.body() != null;
@@ -142,6 +149,8 @@ public class API {
                     }
                 }
                 System.out.println("Nessuna risposta disponibile.");
+                Error error = new Error("Nessuna risposta disponibile.");
+                error.start(new Stage());
             }
         }catch (Exception e) {
             e.printStackTrace();
@@ -165,6 +174,8 @@ public class API {
                 spokenSpeech = new ByteArrayInputStream(mp3.getBody().readAllBytes());
             } else {
                 System.out.println("Errore nella richiesta API: " + mp3.getStatus());
+                Error error = new Error("Errore nella richiesta API");
+                error.start(new Stage());
             }
 
         } catch (Exception e) {
@@ -225,9 +236,13 @@ public class API {
                     }
                 } else {
                     System.out.println("Nessuna foto trovata.");
+                    Error error = new Error("Nessuna foto trovata.");
+                    error.start(new Stage());
+
                 }
             } else {
-                System.out.println("Nessuna foto trovata.");
+                Error error = new Error("Nessuna foto trovata.");
+                error.start(new Stage());
             }
         } catch (Exception e) {
             e.printStackTrace();

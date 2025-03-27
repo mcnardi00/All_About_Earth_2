@@ -11,6 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class Error extends Application {
@@ -23,8 +24,7 @@ public class Error extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        // Configura il nuovo stage per il messaggio di errore
-        //stage.initModality(Modality.APPLICATION_MODAL); // Rende la finestra modale
+        //Configura il nuovo stage per il messaggio di errore
         stage.setTitle("Errore");
 
         VBox content = new VBox(20);
@@ -33,6 +33,7 @@ public class Error extends Application {
 
         Label messageLabel = new Label(errorMessage);
         messageLabel.setTextAlignment(TextAlignment.CENTER);
+
         //messageLabel.setWrapText(true);
         messageLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         messageLabel.setTextFill(Color.WHITE);
@@ -50,7 +51,9 @@ public class Error extends Application {
         Scene errorScene = new Scene(pane, 400, 200);
         stage.setScene(errorScene);
 
-        // Mostra la finestra di errore
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        //Mostra la finestra di errore
         stage.showAndWait(); // Blocca finché non viene chiusa
     }
 }

@@ -201,7 +201,7 @@ public class Home extends Application {
             buttonBox.setLayoutY(200);
 
             //Disposizione bottoni per sidebar
-            sidebarBox.setLayoutX(-500);
+            sidebarBox.setLayoutX(-520);
             sidebarBox.setLayoutY(0);
         }else{
             //Setto alla scena la camera
@@ -237,8 +237,8 @@ public class Home extends Application {
 
         sideBox.getChildren().addAll(settings, history);
         setSideButtonStyle();
-        sideBox.setLayoutY(-80);
-        sideBox.setLayoutX(-440);
+        sideBox.setLayoutY(-60);
+        sideBox.setLayoutX(-460);
 
         return sideBox;
     }

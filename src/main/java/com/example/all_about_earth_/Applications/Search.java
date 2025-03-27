@@ -108,7 +108,11 @@ public class Search extends Application {
 
 
         searchStage.setResizable(false);
-        searchStage.initModality(Modality.APPLICATION_MODAL);
+
+        if(!(searchStage.getModality() == Modality.APPLICATION_MODAL)){
+            searchStage.initModality(Modality.APPLICATION_MODAL);
+        }
+
 
         searchStage.showAndWait();
     }
