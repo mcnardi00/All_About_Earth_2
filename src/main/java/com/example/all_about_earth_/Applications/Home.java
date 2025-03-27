@@ -42,7 +42,7 @@ public class Home extends Application {
 
     private VBox sideBar = new VBox();
 
-    private TextField searchField = new TextField();
+    private final TextField searchField = new TextField();
 
     private final API api = new API();
 

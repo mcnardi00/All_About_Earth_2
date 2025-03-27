@@ -80,8 +80,7 @@ public class API {
                 }
                 System.out.println("Nessuna risposta disponibile.");
             }
-        }catch (Exception e) {
-        }
+        }catch (Exception e) {}
     }
 
     public void sendPrompt(String place) {
@@ -91,9 +90,9 @@ public class API {
             part.put("text", "Genera un testo informativo in formato [Nome della città], [Paese] che includa:\n" +
                     "\n" +
                     "Una breve descrizione della località, menzionando eventuali caratteristiche geografiche rilevanti.\n" +
-                    "Una sezione storica che descriva brevemente la fondazione o eventi storici significativi legati alla località.\n" +
+                    "Una sezione \"Storia\" che descriva brevemente la fondazione o eventi storici significativi legati alla località.\n" +
                     "Una sezione \"Curiosità\" che presenti uno o due fatti interessanti o insoliti sulla località.\n" +
-                    "Utilizza il seguente nome come riferimento per la località: " + place + "\n Rispondi solo con il testo informativo o con Il luogo inserito non è valido");
+                    "Utilizza il seguente nome come riferimento per la località: " + place + "\n Rispondi solo con il testo informativo o con la stringa Il luogo inserito non è valido");
 
             JSONArray partsArray = new JSONArray();
             partsArray.put(part);
@@ -175,19 +174,24 @@ public class API {
 
     public void getPlaceId(){
         try{
-            OkHttpClient client = new OkHttpClient();
-            String url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?" + "input=" + place_name.replace(" ", "%20") + "&inputtype=textquery&fields=place_id&key=" + MAPS_API_KEY;
+            place_name = place_name.replace("*","");
+            if (!place_name.equals("Il luogo inserito non è valido")){
+                OkHttpClient client = new OkHttpClient();
+                String url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?" + "input=" + place_name.replace(" ", "%20") + "&inputtype=textquery&fields=place_id&key=" + MAPS_API_KEY;
 
-            Request request = new Request.Builder().url(url).build();
-            Response response = client.newCall(request).execute();
-            assert response.body() != null;
-            String jsonResponse = response.body().string();
+                Request request = new Request.Builder().url(url).build();
+                Response response = client.newCall(request).execute();
+                assert response.body() != null;
+                String jsonResponse = response.body().string();
 
-            JSONObject jsonObject = new JSONObject(jsonResponse);
-            JSONArray candidates = jsonObject.getJSONArray("candidates");
+                JSONObject jsonObject = new JSONObject(jsonResponse);
+                JSONArray candidates = jsonObject.getJSONArray("candidates");
 
-            if (!candidates.isEmpty()) {
-                place_id = candidates.getJSONObject(0).getString("place_id");
+                if (!candidates.isEmpty()) {
+                    place_id = candidates.getJSONObject(0).getString("place_id");
+                }
+            }else {
+                place_id = null;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -196,25 +200,31 @@ public class API {
 
     public String[] getPlacePhotos(){
         String[] photo = new String[10];
+        System.out.println(place_name);
+        System.out.println(place_id);
         try{
-            OkHttpClient client = new OkHttpClient();
-            String url = "https://maps.googleapis.com/maps/api/place/details/json?" + "place_id=" + place_id + "&fields=photos&key=" + MAPS_API_KEY;
+            if (place_id != null){
+                OkHttpClient client = new OkHttpClient();
+                String url = "https://maps.googleapis.com/maps/api/place/details/json?" + "place_id=" + place_id + "&fields=photos&key=" + MAPS_API_KEY;
 
-            Request request = new Request.Builder().url(url).build();
-            Response response = client.newCall(request).execute();
-            assert response.body() != null;
-            String jsonResponse = response.body().string();
+                Request request = new Request.Builder().url(url).build();
+                Response response = client.newCall(request).execute();
+                assert response.body() != null;
+                String jsonResponse = response.body().string();
 
-            JSONObject jsonObject = new JSONObject(jsonResponse);
-            JSONObject result = jsonObject.getJSONObject("result");
+                JSONObject jsonObject = new JSONObject(jsonResponse);
+                JSONObject result = jsonObject.getJSONObject("result");
 
-            if (result.has("photos")) {
-                JSONArray photos = result.getJSONArray("photos");
-                int count = Math.min(photos.length(), 10); // Prende massimo 4 foto
+                if (result.has("photos")) {
+                    JSONArray photos = result.getJSONArray("photos");
+                    int count = Math.min(photos.length(), 10);
 
-                for (int i = 0; i < count; i++) {
-                    String photoReference = photos.getJSONObject(i).getString("photo_reference");
-                    photo[i] = "https://maps.googleapis.com/maps/api/place/photo?" + "maxwidth=1050&photo_reference=" + photoReference + "&key=" + MAPS_API_KEY;
+                    for (int i = 0; i < count; i++) {
+                        String photoReference = photos.getJSONObject(i).getString("photo_reference");
+                        photo[i] = "https://maps.googleapis.com/maps/api/place/photo?" + "maxwidth=1050&photo_reference=" + photoReference + "&key=" + MAPS_API_KEY;
+                    }
+                } else {
+                    System.out.println("Nessuna foto trovata.");
                 }
             } else {
                 System.out.println("Nessuna foto trovata.");
