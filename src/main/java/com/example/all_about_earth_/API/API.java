@@ -2,7 +2,6 @@ package com.example.all_about_earth_.API;
 
 import com.example.all_about_earth_.Applications.Error;
 import com.example.all_about_earth_.Applications.Illustration;
-import com.example.all_about_earth_.Applications.Search;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -22,8 +21,6 @@ import java.net.URL;
 
 public class API {
 
-    private Search search = new Search();
-
     private final static String MAPS_API_KEY = "AIzaSyDA-cz4lKPKW4XS3iVHKX5qtStLBmsOw9w";
     private static final String GEMINI_API_KEY = "AIzaSyDGV9CmAf7cJDGs--3vpyecsgrMJLmVCEo";
     private static final String ELEVENLABS_API_KEY = "sk_fd88bccbb515b640bf2f127b79007200fecefe7930644d3e";// toDo controllare la API key prima di consegnare
@@ -33,9 +30,10 @@ public class API {
     private String place_name;
     private String place_id;
 
-    private Illustration illustration = new Illustration(this);
+    private boolean exceptionOpened = false;
+    private boolean placeFound = true;
 
-    public boolean sendPrompt() {
+    public void sendPrompt() {
         if (place_name == null){
             OkHttpClient httpClient = new OkHttpClient();
             try {
@@ -74,8 +72,6 @@ public class API {
                         System.out.println("Errore nella richiesta: " + response.code());
                         Error error = new Error("Errore nella richiesta");
                         error.start(new Stage());
-                        search.setIsOpened(true);
-                        return false;
                     }
 
                     assert response.body() != null;
@@ -95,21 +91,16 @@ public class API {
                             getPlaceId();
                             writtenSpeech = temp[0] + temp[1];
                             //getSpeech(); toDo
-                            search.setIsOpened(false);
-                            return true;
+                            return;
                         }
                     }
                     Error error = new Error("Nessuna risposta disponibile.");
                     error.start(new Stage());
-                    search.setIsOpened(true);
-                    return false;
                 }
             }catch (Exception e) {
                 Error error = new Error("Nessuna risposta disponibile.");
                 try {
                     error.start(new Stage());
-                    search.setIsOpened(true);
-                    return false;
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -152,8 +143,6 @@ public class API {
                         System.out.println("Errore nella richiesta: " + response.code());
                         Error error = new Error("Errore nella richiesta");
                         error.start(new Stage());
-                        search.setIsOpened(true);
-                        return false;
                     }
 
                     assert response.body() != null;
@@ -171,21 +160,16 @@ public class API {
                             getPlaceId();
                             writtenSpeech = firstPart.getString("text");
                             //getSpeech(); toDo
-                            search.setIsOpened(false);
-                            return true;
+                            return;
                         }
                     }
                     Error error = new Error("Nessuna risposta disponibile.");
                     error.start(new Stage());
-                    search.setIsOpened(true);
-                    return false;
                 }
             }catch (Exception e) {
                 Error error = new Error("Nessuna risposta disponibile.");
                 try {
                     error.start(new Stage());
-                    search.setIsOpened(true);
-                    return false;
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -195,6 +179,8 @@ public class API {
     }
 
     public void getCityByText(String text) {
+        placeFound = true;
+
         try {
             String urlString = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + text.replace(" ", "+") + "&key=" + MAPS_API_KEY;
             URL url = new URL(urlString);
@@ -244,6 +230,7 @@ public class API {
                 place_name = foundCountry;
             } else {
                 Error error = new Error("Nessuna città o paese trovati per: " + text);
+                placeFound = false;
                 error.start(new Stage());
             }
 
@@ -320,6 +307,8 @@ public class API {
     }
 
     public String[] getPlacePhotos(){
+        exceptionOpened = false;
+
         String[] photo = new String[10];
         System.out.println(place_name);
         System.out.println(place_id);
@@ -336,6 +325,7 @@ public class API {
                 JSONObject jsonObject = new JSONObject(jsonResponse);
                 JSONObject result = jsonObject.getJSONObject("result");
 
+                System.out.println(isExceptionOpened());
                 if (result.has("photos")) {
                     JSONArray photos = result.getJSONArray("photos");
                     int count = Math.min(photos.length(), 10);
@@ -344,21 +334,27 @@ public class API {
                         String photoReference = photos.getJSONObject(i).getString("photo_reference");
                         photo[i] = "https://maps.googleapis.com/maps/api/place/photo?" + "maxwidth=1050&photo_reference=" + photoReference + "&key=" + MAPS_API_KEY;
                     }
+
                 } else {
                     System.out.println("Nessuna foto trovata.");
                     Error error = new Error("Nessuna foto trovata.");
+                    exceptionOpened = true;
+                    System.out.println(isExceptionOpened());
                     error.start(new Stage());
-                    illustration.setIsOpened(true);
                 }
             } else {
                 Error error = new Error("Nessuna foto trovata.");
+                exceptionOpened = true;
                 error.start(new Stage());
-                illustration.setIsOpened(true);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return photo;
+    }
+
+    public boolean isExceptionOpened() {
+        return exceptionOpened;
     }
 
     public void setLatitude(double latitude) {
@@ -379,5 +375,13 @@ public class API {
 
     public String getPlace_name() {
         return place_name;
+    }
+
+    public boolean isPlaceFound() {
+        return placeFound;
+    }
+
+    public void setPlaceFound(boolean placeFound) {
+        this.placeFound = placeFound;
     }
 }

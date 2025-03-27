@@ -42,11 +42,11 @@ public class Illustration extends Application {
 
     private API api;
 
-    private boolean isOpened = false;
-
     public Illustration(API api){
         this.api = api;
     }
+
+    public Illustration(){}
 
     private final ImageView imageView = new ImageView();
     private int currentImageIndex = 0;
@@ -54,6 +54,8 @@ public class Illustration extends Application {
 
     private double screenWidth;
     private double screenHeight;
+
+    private boolean ExceptionOpened = false;
 
     @Override
     public void start(Stage stage) {
@@ -82,11 +84,7 @@ public class Illustration extends Application {
         borderPane.setTop(titleBox);
 
         // **Testo descrittivo con box trasparente**
-        if(!api.sendPrompt()){
-            home.start(new Stage());
-            stage.close();
-            return;
-        }
+        api.sendPrompt();
 
         String formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ","").trim();
         Label text = new Label(formattedText);
@@ -96,32 +94,28 @@ public class Illustration extends Application {
         text.setWrapText(true);
 
         if(screenHeight == 1032.0 && screenWidth == 1920.0){
-            text.setMaxWidth(900);
+            text.setMaxWidth(800);
             text.setMaxHeight(700);
         }else{
             text.setMaxWidth(600);
-            text.setMaxHeight(600);
+            text.setMaxHeight(500);
         }
 
         text.setPadding(new Insets(25));
         text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px; -fx-border-color: white; -fx-border-width: 2px; -fx-alignment: center;");
         text.setWrapText(true);
 
-        photoUrls = api.getPlacePhotos();
-
-        if(isOpened){
-            home.start(new Stage());
-            stage.close();
-        }else{
+        if(!api.isExceptionOpened()){
+            photoUrls = api.getPlacePhotos();
             imageView.setImage(new Image(photoUrls[0]));
         }
-
+        
         if(screenHeight == 1032.0 && screenWidth == 1920.0){
             imageView.setFitWidth(1050);
             imageView.setFitHeight(700);
         }else{
-            imageView.setFitWidth(700);
-            imageView.setFitHeight(600);
+            imageView.setFitWidth(650);
+            imageView.setFitHeight(500);
         }
 
         imageView.setStyle("-fx-padding: 3;");
@@ -277,12 +271,8 @@ public class Illustration extends Application {
         timeline.play();
     }
 
-
-    public void setIsOpened(boolean isOpened){
-        this.isOpened = isOpened;
-    }
-
     public static void main(String[] args) {
         launch(args);
     }
 }
+

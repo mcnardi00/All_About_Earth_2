@@ -81,12 +81,13 @@ public class Search extends Application {
             if(!text.isEmpty()){
                 //home.setTextFromSearch(text);
                 api.getCityByText(text.trim());
-                Illustration illustration = new Illustration(api);
-                illustration.start(new Stage());
-                searchStage.close();
-                homeStage.close();
 
-                //todo: fare richiesta api
+                if(api.isPlaceFound()){
+                    Illustration illustration = new Illustration(api);
+                    illustration.start(new Stage());
+                    searchStage.close();
+                    homeStage.close();
+                }
             }else{
                 System.out.println("testo vuoto");
             }
@@ -117,10 +118,7 @@ public class Search extends Application {
             searchStage.initModality(Modality.APPLICATION_MODAL);
         }
 
-        try{
-            searchStage.showAndWait();
-        }catch(Exception e){
-        }
+        searchStage.show();
 
     }
 
