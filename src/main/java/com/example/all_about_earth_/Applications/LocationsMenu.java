@@ -1,6 +1,8 @@
 package com.example.all_about_earth_.Applications;
 
+import com.example.all_about_earth_.API.API;
 import com.example.all_about_earth_.Managers.HistoryManager;
+import com.example.all_about_earth_.Object.Coordinate;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,11 +17,9 @@ public class LocationsMenu extends Application {
 
     private HistoryManager historyManager = new HistoryManager();
 
-    private String placeName;
-
     @Override
     public void start(Stage stage) {
-        showHistory();
+        showHistory(stage);
 
         Scene scene = new Scene(menuBox, 220, 320);
 
@@ -28,12 +28,11 @@ public class LocationsMenu extends Application {
         stage.setMaxHeight(320);
         stage.setResizable(false);
         //stage.initModality(Modality.APPLICATION_MODAL);
-
         stage.show();
     }
 
     //todo:sistemare che se è vuoto stampa che è vuoto
-    public void showHistory() {
+    public void showHistory(Stage stage) {
         ArrayList<String> locations = historyManager.readLocations();
 
         menuBox.setStyle(
@@ -79,9 +78,12 @@ public class LocationsMenu extends Application {
                             "-fx-text-fill: #ffffff;"
             ));
 
-
-            //Todo: Far aprire illustration locationButton.setOnAction(e -> {});
-
+            locationButton.setOnAction(e -> {
+                ArrayList<Coordinate> coordinates = historyManager.readCoordinateFile();
+                Illustration illustration = new Illustration(new API(coordinates.get(locations.indexOf(location)).getWrittenSpeech(),coordinates.get(locations.indexOf(location)).getPlace_name(),coordinates.get(locations.indexOf(location)).getPlace_id()));
+                illustration.start(new Stage());
+                stage.close();
+            });
 
             menuBox.getChildren().add(locationButton);
         }

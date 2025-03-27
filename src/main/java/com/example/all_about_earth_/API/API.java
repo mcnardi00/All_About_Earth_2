@@ -33,6 +33,14 @@ public class API {
     private boolean exceptionOpened = false;
     private boolean placeFound = true;
 
+    public API(String writtenSpeech, String place_name, String place_id) {
+        this.writtenSpeech = writtenSpeech;
+        this.place_name = place_name;
+        this.place_id = place_id;
+    }
+
+    public API() {}
+
     public void sendPrompt() {
         if (place_name == null){
             OkHttpClient httpClient = new OkHttpClient();
