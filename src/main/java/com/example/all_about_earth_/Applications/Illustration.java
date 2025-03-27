@@ -33,7 +33,7 @@ public class Illustration extends Application {
     private final StackPane generalPane = new StackPane();
     private final HBox imageAndText = new HBox(30);
 
-    private VBox BottomContainer = new VBox(10);
+    private final VBox BottomContainer = new VBox(10);
     private final Slider audioSlider = new Slider();
 
     private final Button audioButton = new Button();
@@ -93,7 +93,7 @@ public class Illustration extends Application {
         text.setTextFill(Color.WHITE);
         text.setWrapText(true);
 
-        if(screenHeight == 1032.0 && screenWidth == 1920.0){
+        if(screenHeight == 1080.0 && screenWidth == 1920.0){
             text.setMaxWidth(800);
             text.setMaxHeight(700);
         }else{

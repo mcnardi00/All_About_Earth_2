@@ -246,57 +246,6 @@ public class Home extends Application {
         return sideBox;
     }
 
-    /*
-    private HBox createSearchBar() {
-        searchField.setPromptText("Cerca una località...");
-        searchField.setPrefWidth(200);
-        searchField.setPrefHeight(45);
-        searchField.setStyle(
-                "-fx-background-color: rgba(255, 255, 255, 0.3);" +
-                        "-fx-background-radius: 20;" +
-                        "-fx-padding: 5;" +
-                        "-fx-border-color: rgba(255, 255, 255, 0.5);" +
-                        "-fx-border-width: 1px;" +
-                        "-fx-border-radius: 20;" +
-                        "-fx-text-fill: black;" +  // Cambia il colore del testo
-                        "-fx-prompt-text-fill: rgba(0, 0, 0, 0.5);" // Anche il placeholder più scuro
-        );
-
-        Image searchImage = new Image("lente.png");
-        ImageView searchView = new ImageView(searchImage);
-        searchView.setFitWidth(35);
-        searchView.setFitHeight(35);
-        searchView.setSmooth(true);
-        searchView.setPreserveRatio(true);
-
-        searchButton = new Button();
-        searchButton.setMaxSize(40, 40);
-        searchButton.setGraphic(searchView);
-        searchButton.setStyle(
-                "-fx-background-color: rgba(255, 255, 255, 0.2); " +
-                        "-fx-background-radius: 20; " +
-                        "-fx-padding: 5; " +
-                        "-fx-border-color: rgba(255, 255, 255, 0.5); " +
-                        "-fx-border-width: 1px; " +
-                        "-fx-border-radius: 20;"
-        );
-
-        searchButton.setOnAction(e -> {
-            String location = searchField.getText();
-            if (!location.isEmpty()) {
-                System.out.println("non è vuoto");
-            }
-        });
-
-        HBox searchBox = new HBox(10, searchButton, searchField);
-        searchBox.setPadding(new Insets(10));
-        searchBox.setLayoutY(20); // Sposta la barra di ricerca più in alto
-        searchBox.setLayoutX(WIDTH / 2 - 150);
-
-        return searchBox;
-    }
-    */
-
     //Fornisce lo stile ai bottoni in basso a destra
     public void setButtonStyle() {
         randomPointer.setStyle(
