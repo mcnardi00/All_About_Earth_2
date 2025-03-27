@@ -260,15 +260,21 @@ public class Illustration extends Application {
     }
 
     private void startImageSlideshow() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(10), event -> {
-            if (photoUrls.length > 0) {
-                currentImageIndex = (currentImageIndex + 1) % photoUrls.length;
-                Image newImage = new Image(photoUrls[currentImageIndex]);
-                imageView.setImage(newImage);
-            }
-        }));
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+        if (!api.isExceptionOpened()) {
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(10), event -> {
+                if (photoUrls.length > 0) {
+                    if (currentImageIndex == (photoUrls.length - 1)) {
+                        currentImageIndex = 0;
+                    } else {
+                        currentImageIndex = (currentImageIndex + 1) % photoUrls.length;
+                    }
+                    Image newImage = new Image(photoUrls[currentImageIndex]);
+                    imageView.setImage(newImage);
+                }
+            }));
+            timeline.setCycleCount(Animation.INDEFINITE);
+            timeline.play();
+        }
     }
 
     public static void main(String[] args) {

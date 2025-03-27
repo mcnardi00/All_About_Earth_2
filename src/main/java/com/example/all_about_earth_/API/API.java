@@ -316,7 +316,7 @@ public class API {
             if (place_id != null){
                 OkHttpClient client = new OkHttpClient();
                 String url = "https://maps.googleapis.com/maps/api/place/details/json?" + "place_id=" + place_id + "&fields=photos&key=" + MAPS_API_KEY;
-
+                System.out.println(url);
                 Request request = new Request.Builder().url(url).build();
                 Response response = client.newCall(request).execute();
                 assert response.body() != null;
@@ -336,7 +336,6 @@ public class API {
                     }
 
                 } else {
-                    System.out.println("Nessuna foto trovata.");
                     Error error = new Error("Nessuna foto trovata.");
                     exceptionOpened = true;
                     System.out.println(isExceptionOpened());
