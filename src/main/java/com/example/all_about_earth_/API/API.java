@@ -3,6 +3,7 @@ package com.example.all_about_earth_.API;
 import com.example.all_about_earth_.Applications.Error;
 import com.example.all_about_earth_.Applications.Illustration;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mashape.unirest.http.HttpResponse;
@@ -12,12 +13,11 @@ import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class API {
 
@@ -198,7 +198,8 @@ public class API {
         placeFound = true;
 
         try {
-            String urlString = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + text.replace(" ", "+") + "&key=" + MAPS_API_KEY;
+            String urlString = "https://maps.googleapis.com/maps/api/geocode/json?address="
+                    + URLEncoder.encode(text, "UTF-8") + "&key=" + MAPS_API_KEY;
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
@@ -206,7 +207,6 @@ public class API {
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder response = new StringBuilder();
             String inputLine;
-
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
@@ -215,58 +215,45 @@ public class API {
             JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
             JsonArray results = jsonObject.getAsJsonArray("results");
 
+            if (results.size() == 0) {
+                throw new Exception("Nessun risultato trovato per: " + text);
+            }
+
+            JsonObject firstResult = results.get(0).getAsJsonObject();
+            JsonArray addressComponents = firstResult.getAsJsonArray("address_components");
+
             String foundCity = null;
             String foundCountry = null;
 
-            for (int i = 0; i < results.size(); i++) {
-                JsonObject place = results.get(i).getAsJsonObject();
-                JsonArray types = place.getAsJsonArray("types");
-                String address = place.get("formatted_address").getAsString();
+            for (JsonElement element : addressComponents) {
+                JsonObject obj = element.getAsJsonObject();
+                JsonArray types = obj.getAsJsonArray("types");
 
                 if (types.toString().contains("locality")) {
-                    String[] parts = address.split(",");
-                    String city = parts[0].trim();
-                    String country = parts[parts.length - 1].trim();
-
-                    city = city.replaceAll("^\\d+\\s*", "");
-
-                    foundCity = city + ", " + country;
-                    break;
-                } else if (types.toString().contains("country")) {
-                    String[] parts = address.split(",");
-                    foundCountry = parts[0].trim() + ", " + parts[parts.length - 1].trim();
+                    foundCity = obj.get("long_name").getAsString();
+                }
+                if (types.toString().contains("country")) {
+                    foundCountry = obj.get("long_name").getAsString();
                 }
             }
 
-            if (foundCity != null) {
-                System.out.println("✅ Città trovata: " + foundCity);
-                place_name = foundCity;
-            } else if (foundCountry != null) {
-                System.out.println("✅ Paese trovato: " + foundCountry);
-                place_name = foundCountry;
+            if (foundCity != null && foundCountry != null) {
+                place_name = foundCity + ", " + foundCountry;
+                System.out.println("✅ Città trovata: " + place_name);
             } else {
-                Error error = new Error("Nessuna città o paese trovati per: " + text);
-                placeFound = false;
-                error.start(new Stage());
+                throw new Exception("Nessuna città trovata per: " + text);
             }
 
         } catch (Exception e) {
-            Error error = new Error("Nessuna città o paese trovati per: " + text);
+            System.err.println("Errore: " + e.getMessage());
+            placeFound = false;
+            Error error = new Error(e.getMessage());
             try {
                 error.start(new Stage());
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
-    }
-
-
-    private String cleanAddress(String address) {
-        String[] parts = address.split(",");
-        if (parts.length >= 2) {
-            return parts[0].trim() + ", " + parts[parts.length - 1].trim();
-        }
-        return address; // Se l'indirizzo è strano, ritorna l'originale
     }
 
 
