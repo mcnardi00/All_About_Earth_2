@@ -6,15 +6,12 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Point3D;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.input.ScrollEvent;
@@ -22,8 +19,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Modality;
@@ -40,12 +35,10 @@ public class Home extends Application {
 
     //Bottoni sideBar
     private Button settings;
-    private Button audio;
-    private Button history;
 
     private HBox buttonBox;
 
-    private VBox sideBar = new VBox();
+    private HBox sideBar = new HBox();
 
     private final TextField searchField = new TextField();
 
@@ -131,21 +124,42 @@ public class Home extends Application {
             api.setLongitude(longitudine);
             api.setLongitude(latitudine);
 
-            // Apri la finestra con i dati del luogo cliccato
-            Illustration illustration = new Illustration(api);
-            illustration.start(new Stage());
-            homeStage.close();
+            showLoading();
         });
+
 
         //Tasto ricerca
         Image searchImage = new Image("lente.png");
         ImageView searchView = new ImageView(searchImage);
         searchView.setFitHeight(30);
-        searchView.setFitWidth(35);
+        searchView.setFitWidth(40);
         searchView.setSmooth(true);
         searchView.setPreserveRatio(true);
         searchButton.setMaxSize(40, 50);
         searchButton.setGraphic(searchView);
+
+        //Tasto cronologia
+        Image historyImage = new Image("history2.png");
+        ImageView historyView = new ImageView(historyImage);
+        historyView.setFitWidth(30);
+        historyView.setFitHeight(30);
+
+        Button historyButton = new Button();
+        historyButton.setMaxSize(40,40);
+        historyButton.setGraphic(historyView);
+        historyButton.setStyle("-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E); " +
+                "-fx-background-radius: 15; " +
+                "-fx-border-color: #ECF0F1; " +
+                "-fx-border-width: 1px; " +
+                "-fx-border-radius: 15; " +
+                "-fx-padding: 5; " +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 2);");
+
+        historyButton.setOnAction(e->{
+            LocationsMenu locationsMenu = new LocationsMenu(homeStage);
+            locationsMenu.start(new Stage());
+        });
+
 
         //Fa partire il nuovo stage e chiude questo
         searchButton.setOnAction(e-> {
@@ -154,22 +168,8 @@ public class Home extends Application {
         });
 
         //Li inserisco nel HBox
-        buttonBox = new HBox(10, randomPointer, searchButton); // 10 è il padding tra i bottoni
+        buttonBox = new HBox(10, randomPointer, searchButton, historyButton); // 10 è il padding tra i bottoni
         buttonBox.setPadding(new Insets(0, 0, 20, 20));
-
-        //Tasto sideBar
-        Image sidebarImage = new Image("play2.png");
-        ImageView sidebarView = new ImageView(sidebarImage);
-        sidebarView.setFitHeight(50);
-        sidebarView.setFitWidth(50);
-        sidebarView.setSmooth(true);
-        sidebarView.setPreserveRatio(true);
-        sidebarButton.setMaxSize(50, 50);
-        sidebarButton.setGraphic(sidebarView);
-        sidebarButton.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; ");
-
-        //Hbox della sideBar
-        HBox sidebarBox = new HBox(sidebarButton);
 
         //Fornisce lo stile ai bottoni
         setButtonStyle();
@@ -179,36 +179,6 @@ public class Home extends Application {
         root.getChildren().add(prepareImageView());
         root.getChildren().add(slider);
         root.getChildren().add(buttonBox);
-        root.getChildren().add(sidebarBox);
-
-        //Crea la sidebar e imposta i suoi eventi
-        sideBar = createSidebar();
-
-        sidebarButton.setOnAction(e -> {
-            System.out.println("sideButton cliccato");
-
-            //Se la sidebar è aperta la tolgo
-            if (isClicked) {
-                root.getChildren().remove(sideBar);
-                isClicked = false;
-            } else {  //Se la sidebar è chiusa la apro
-                sideBar = createSidebar();
-
-                root.getChildren().add(sideBar);
-
-                //Azione per il bottone Impostazioni
-                settings.setOnAction(event -> System.out.println("Impostazioni cliccate"));
-
-                //Azione per il bottone Cronologia
-                history.setOnAction(event-> {
-                    LocationsMenu locationsMenu = new LocationsMenu(homeStage);
-                    locationsMenu.start(new Stage());
-                });
-
-                isClicked = true;
-            }
-
-        });
 
         if(screenHeight == 1032.0 && screenWidth == 1920.0){
             //Setto alla scena la camera
@@ -217,23 +187,25 @@ public class Home extends Application {
             scene.setCamera(camera);
 
             //Disposizione bottoni per scelta
-            buttonBox.setLayoutX(380);
+            buttonBox.setLayoutX(320);
             buttonBox.setLayoutY(200);
 
             //Disposizione bottoni per sidebar
-            sidebarBox.setLayoutX(-520);
-            sidebarBox.setLayoutY(0);
+            sideBar.setLayoutX(-380);
+            sideBar.setLayoutY(200);
+
         }else{
             //Setto alla scena la camera
             scene = new Scene(root, screenWidth, screenHeight, true);
             scene.setFill(Color.SILVER);
             scene.setCamera(camera);
 
-            buttonBox.setLayoutX(360);
+            buttonBox.setLayoutX(300);
             buttonBox.setLayoutY(200);
 
-            sidebarBox.setLayoutX(-510);
-            sidebarBox.setLayoutY(0);
+            sideBar.setLayoutX(-475);
+            sideBar.setLayoutY(200);
+
         }
 
         //Gestisce il controllo del mouse e del click
@@ -246,23 +218,6 @@ public class Home extends Application {
 
         //Prepara l'animazione della terra che ruota
         prepareAnimation();
-    }
-
-    //Crea la sidebar e i suoi bottoni
-    public VBox createSidebar() {
-        VBox sideBox = new VBox();
-        sideBox.setSpacing(15);
-        sideBox.setPadding(new Insets(20));
-
-        settings = createSidebarButton("Impostazioni", "settingsWhite.png");
-        history = createSidebarButton("History", "history.png");
-
-        sideBox.getChildren().addAll(settings, history);
-        setSideButtonStyle();
-        sideBox.setLayoutY(-60);
-        sideBox.setLayoutX(-460);
-
-        return sideBox;
     }
 
     //Fornisce lo stile ai bottoni in basso a destra
@@ -295,52 +250,6 @@ public class Home extends Application {
                         "-fx-border-width: 1px; " +
                         "-fx-border-radius: 20;"
         );
-    }
-
-    //Fornisce lo stile ai bottoni della sidebar
-    public void setSideButtonStyle() {
-        settings.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
-                "-fx-background-radius: 20; " +
-                "-fx-padding: 10; " +
-                "-fx-border-color: rgba(255, 255, 255, 0.5); " +
-                "-fx-border-width: 1px; " +
-                "-fx-border-radius: 20;");
-
-        history.setStyle("-fx-background-color: rgba(255, 255, 255, 0.2); " +
-                "-fx-background-radius: 20; " +
-                "-fx-padding: 10; " +
-                "-fx-border-color: rgba(255, 255, 255, 0.5); " +
-                "-fx-border-width: 1px; " +
-                "-fx-border-radius: 20;");
-    }
-
-    //Crea i bottoni per la sidebar
-    public Button createSidebarButton(String text, String image) {
-        Image icon = new Image(image);
-        ImageView iconView = new ImageView(icon);
-        iconView.setFitWidth(30);
-        iconView.setFitHeight(30);
-
-        //Testo del bottone
-        Label label = new Label(text);
-        label.setTextFill(Color.web("#ECF0F1"));
-        label.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
-
-        HBox buttonContent = new HBox(15, iconView, label);
-        buttonContent.setAlignment(Pos.CENTER_LEFT);
-
-        Button button = new Button();
-        button.setGraphic(buttonContent);
-        button.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-padding: 12px;" +
-                        "-fx-border-radius: 10px;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-text-fill: #ECF0F1;"
-        );
-
-        button.setMaxWidth(Double.MAX_VALUE);
-        return button;
     }
 
     //Rotazione della terra
@@ -382,7 +291,24 @@ public class Home extends Application {
     //Mette le immagini sulla sfera
     private Node prepareEarth() {
         PhongMaterial earthMaterial = new PhongMaterial();
-        earthMaterial.setDiffuseMap(new Image("earth-d.jpg"));
+
+        /*
+        Image diffuseImage = new Image("earth-d.jpg");
+        ImageView earthView = new ImageView(diffuseImage);
+        earthView.setRotate(180); // Ruota la texture di 180°
+        earthMaterial.setDiffuseMap(earthView.getImage());
+         */
+
+        /*
+        Image image = new Image("earth-d.jpg");
+        WritableImage rotatedImage = rotateImage(image, 180);  // Ruota la texture di 180°
+        earthMaterial.setDiffuseMap(rotatedImage);
+         */
+        Image image = new Image("earth-d.jpg");
+        //shiftImageHorizontally(image,1000);
+        earthMaterial.setDiffuseMap(image);
+        //printCenterPixels(image);
+
         earthMaterial.setSelfIlluminationMap(new Image("earth-l.jpg"));
         earthMaterial.setSpecularMap(new Image("earth-s.png"));
         earthMaterial.setBumpMap(new Image("earth-n.jpg"));
@@ -394,6 +320,39 @@ public class Home extends Application {
         test.sphere = sphere;
         test.runCoordinateTests();*/
         return sphere;
+    }
+
+    private Image shiftImageHorizontally(Image image, int shift) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        WritableImage shiftedImage = new WritableImage(width, height);
+        PixelReader reader = image.getPixelReader();
+        PixelWriter writer = shiftedImage.getPixelWriter();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int newX = (x + shift) % width; // Scorrimento ciclico
+                writer.setArgb(x, y, reader.getArgb(newX, y));
+            }
+        }
+
+        return shiftedImage;
+    }
+
+    private void printCenterPixels(Image image) {
+        PixelReader reader = image.getPixelReader();
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        int y = height / 2; // Riga centrale
+
+        System.out.println("Pixel al centro della texture:");
+        for (int x = 0; x < width; x += width / 10) { // Stampiamo ogni 10% dell'immagine
+            int argb = reader.getArgb(x, y);
+            Color color = Color.rgb((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF);
+            System.out.println("x = " + x + ", Colore = " + color);
+        }
     }
 
     //Gestisce il mouse e la rotazione
