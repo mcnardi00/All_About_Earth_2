@@ -46,12 +46,16 @@ public class API {
             OkHttpClient httpClient = new OkHttpClient();
             try {
                 JSONObject part = new JSONObject();
-                part.put("text", "Genera un testo informativo in formato [Nome della città], [Paese] che includa:\n" +
+                part.put("text", "Genera un testo informativo dettagliato sulla località geografica specificata, che può essere una città, un insediamento o un'area di interesse. Il testo deve seguire questo formato:\n" +
                         "\n" +
-                        "Una breve descrizione della località, menzionando eventuali caratteristiche geografiche rilevanti.\n" +
-                        "Una sezione storica che descriva brevemente la fondazione o eventi storici significativi legati alla località.\n" +
-                        "Una sezione \"Curiosità\" che presenti uno o due fatti interessanti o insoliti sulla località.\n" +
-                        "Utilizza le seguenti coordinate geografiche come riferimento per la località: " + latitude + ", " + longitude + "\n Rispondi solo con il testo informativo");
+                        "[Nome della località], [Paese/Regione]\n" +
+                        "\n" +
+                        "Descrizione: Fornisci una descrizione concisa della località, evidenziando le sue caratteristiche geografiche, ambientali o culturali rilevanti. Se si tratta di un insediamento, descrivi il tipo di insediamento e le sue peculiarità.\n" +
+                        "Storia: Narra brevemente la storia della località, includendo la sua fondazione, eventi storici significativi o sviluppi chiave.\n" +
+                        "Curiosità: Presenta uno o due fatti interessanti, insoliti o unici sulla località, che possano catturare l'attenzione del lettore.\n" +
+                        "Utilizza le seguenti coordinate geografiche come riferimento per la località: " + latitude + ", " + longitude + ".\n" +
+                        "\n" +
+                        "Assicurati che il testo sia accurato, informativo e coinvolgente. Rispondi fornendo solo il testo informativo, senza preamboli o conclusioni aggiuntive.");
 
                 JSONArray partsArray = new JSONArray();
                 partsArray.put(part);
@@ -117,12 +121,16 @@ public class API {
             OkHttpClient httpClient = new OkHttpClient();
             try {
                 JSONObject part = new JSONObject();
-                part.put("text", "Genera un testo informativo in formato [Nome della città], [Paese] che includa:\n" +
-                        "\n" +
-                        "Una breve descrizione della località, menzionando eventuali caratteristiche geografiche rilevanti.\n" +
-                        "Una sezione storica che descriva brevemente la fondazione o eventi storici significativi legati alla località.\n" +
-                        "Una sezione \"Curiosità\" che presenti uno o due fatti interessanti o insoliti sulla località.\n" +
-                        "Utilizza questo nome come riferimento della località" + place_name + "\n Rispondi solo con il testo informativo");
+                part.put("text", "Genera un testo informativo dettagliato sulla località geografica specificata, che può essere una città, un insediamento o un'area di interesse. Il testo deve seguire questo formato:\n" +
+                                "\n" +
+                                "[Nome della località], [Paese/Regione]\n" +
+                                "\n" +
+                                "Descrizione: Fornisci una descrizione concisa della località, evidenziando le sue caratteristiche geografiche, ambientali o culturali rilevanti. Se si tratta di un insediamento, descrivi il tipo di insediamento e le sue peculiarità.\n" +
+                                "Storia: Narra brevemente la storia della località, includendo la sua fondazione, eventi storici significativi o sviluppi chiave.\n" +
+                                "Curiosità: Presenta uno o due fatti interessanti, insoliti o unici sulla località, che possano catturare l'attenzione del lettore.\n" +
+                                "Utilizza questo nome come riferimento della località, o un insediamento" + place_name + "\n Rispondi solo con il testo informativo" +
+                                "\n" +
+                                "Assicurati che il testo sia accurato, informativo e coinvolgente. Rispondi fornendo solo il testo informativo, senza preamboli o conclusioni aggiuntive.");
 
                 JSONArray partsArray = new JSONArray();
                 partsArray.put(part);

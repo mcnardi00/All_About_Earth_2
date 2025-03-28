@@ -115,7 +115,13 @@ public class Illustration extends Application {
             photoUrls = api.getPlacePhotos();
 
             //Todo:risolvere bug ogni tanto exception
-            imageView.setImage(new Image(photoUrls[0]));
+
+            for (String photoUrl : photoUrls){
+                if(photoUrl != null){
+                    imageView.setImage(new Image(photoUrl));
+                    break;
+                }
+            }
         }
         
         if(screenHeight == 1032.0 && screenWidth == 1920.0){
@@ -280,8 +286,10 @@ public class Illustration extends Application {
                     } else {
                         currentImageIndex = (currentImageIndex + 1) % photoUrls.length;
                     }
-                    Image newImage = new Image(photoUrls[currentImageIndex]);
-                    imageView.setImage(newImage);
+                    if (photoUrls[currentImageIndex] != null){
+                        Image newImage = new Image(photoUrls[currentImageIndex]);
+                        imageView.setImage(newImage);
+                    }
                 }
             }));
             timeline.setCycleCount(Animation.INDEFINITE);

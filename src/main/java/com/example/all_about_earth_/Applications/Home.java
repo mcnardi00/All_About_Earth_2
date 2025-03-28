@@ -26,9 +26,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
 import java.security.SecureRandom;
-import java.util.Random;
 
 public class Home extends Application {
 
