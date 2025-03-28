@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
@@ -464,46 +465,36 @@ public class Home extends Application {
 
         showLoading();
 
-        // Ferma la rotazione della sfera
+        //Ferma la rotazione della sfera
         isRotating = !isRotating;
     }
 
     public void showLoading(){
         ProgressIndicator progressIndicator = new ProgressIndicator();
-        progressIndicator.setLayoutX(360);
+        progressIndicator.setStyle("-fx-progress-color: white;");
+        progressIndicator.setLayoutX(380);
         progressIndicator.setLayoutY(100);
-
         root.getChildren().add(progressIndicator);
 
-        // Avvia Illustration in un thread separato
+        isRotating = true;
+
         new Thread(() -> {
             try {
-                Thread.sleep(3000); // Simula un breve caricamento
+                // Simula un breve caricamento se necessario
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
             Platform.runLater(() -> {
-                root.getChildren().remove(progressIndicator);
-                new Illustration(api).start(new Stage()); // Avvia Illustration
+                //Crea e avvia Illustration in una nuova finestra
+                Stage illustrationStage = new Stage();
+                illustrationStage.initModality(Modality.NONE);
+                Illustration illustration = new Illustration(api);
+                illustration.start(illustrationStage);
                 homeStage.close();
             });
         }).start();
-    }
-
-    public void showLoadingAndStartIllustration(API api) {
-        Stage loadingStage = new Stage();
-        loadingStage.initModality(Modality.APPLICATION_MODAL);
-        loadingStage.setTitle("Caricamento...");
-
-        ProgressIndicator progressIndicator = new ProgressIndicator();
-        StackPane loadingPane = new StackPane(progressIndicator);
-        Scene loadingScene = new Scene(loadingPane, 150, 150);
-
-        loadingStage.setScene(loadingScene);
-        loadingStage.show();
-
-
     }
 
     private double[] sphereCoordinatesToGeographic(Point3D point) {

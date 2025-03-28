@@ -6,6 +6,7 @@ import com.example.all_about_earth_.Object.Coordinate;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -18,6 +19,8 @@ public class LocationsMenu extends Application {
 
     private Stage locationStage;
 
+    private ScrollPane scrollPane = new ScrollPane();
+
     public LocationsMenu(Stage locationStage){
         this.locationStage = locationStage;
     }
@@ -26,7 +29,7 @@ public class LocationsMenu extends Application {
     public void start(Stage stage) {
         showHistory(stage);
 
-        Scene scene = new Scene(menuBox, 220, 320);
+        Scene scene = new Scene(scrollPane, 220, 320);
 
         stage.setScene(scene);
         stage.setMaxWidth(220);
@@ -92,6 +95,12 @@ public class LocationsMenu extends Application {
 
             menuBox.getChildren().add(locationButton);
         }
+
+        scrollPane.setContent(menuBox); // Imposta menuBox come contenuto
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPannable(true);
+        scrollPane.setStyle("-fx-background: black; -fx-border-color: transparent;");
+
     }
 
 }
