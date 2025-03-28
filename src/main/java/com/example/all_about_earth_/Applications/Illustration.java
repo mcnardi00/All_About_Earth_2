@@ -17,6 +17,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -57,6 +58,7 @@ public class Illustration extends Application {
 
     private boolean ExceptionOpened = false;
 
+
     public Illustration(API api){
         this.api = api;
     }
@@ -92,24 +94,29 @@ public class Illustration extends Application {
         // **Testo descrittivo con box trasparente**
         api.sendPrompt();
 
+
         String formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ","").trim();
         Label text = new Label(formattedText);
         System.out.println(formattedText);
         text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 18));
         text.setTextFill(Color.WHITE);
+        //text.setPadding(new Insets(25));
+        //text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px; -fx-border-color: white; -fx-border-width: 2px; -fx-alignment: center;");
         text.setWrapText(true);
+
+        ScrollPane scrollPane = new ScrollPane(text);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPannable(true);
+        scrollPane.setStyle("-fx-background: black");
+        scrollPane.setPadding(new Insets(25));
 
         if(screenHeight == 1080.0 && screenWidth == 1920.0){
-            text.setMaxWidth(800);
-            text.setMaxHeight(700);
+            scrollPane.setMaxWidth(800);
+            scrollPane.setMaxHeight(700);
         }else{
-            text.setMaxWidth(600);
-            text.setMaxHeight(500);
+            scrollPane.setMaxWidth(600);
+            scrollPane.setMaxHeight(500);
         }
-
-        text.setPadding(new Insets(25));
-        text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px; -fx-border-color: white; -fx-border-width: 2px; -fx-alignment: center;");
-        text.setWrapText(true);
 
         if(!api.isExceptionOpened()){
             photoUrls = api.getPlacePhotos();
@@ -129,7 +136,7 @@ public class Illustration extends Application {
         imageView.setStyle("-fx-padding: 3;");
 
         //Contenitore immagine e testo
-        imageAndText.getChildren().addAll(imageView, text);
+        imageAndText.getChildren().addAll(imageView, scrollPane);
         imageAndText.setAlignment(Pos.CENTER);
         borderPane.setCenter(imageAndText);
 
