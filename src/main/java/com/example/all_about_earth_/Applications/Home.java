@@ -389,6 +389,10 @@ public class Home extends Application {
 
         sphere.setRotationAxis(Rotate.Y_AXIS);
         sphere.setMaterial(earthMaterial);
+
+        /*CoordinateMappingTest test = new CoordinateMappingTest();
+        test.sphere = sphere;
+        test.runCoordinateTests();*/
         return sphere;
     }
 
@@ -510,8 +514,12 @@ public class Home extends Application {
         // Calcolo della longitudine
         double longitude = Math.toDegrees(Math.atan2(x, -z));
 
-        // Normalizzazione della longitudine
-        longitude = ((longitude + 180) % 360 + 360) % 360 - 180;
+        // Correzione per la longitudine a 180° esatta
+        if (Math.abs(longitude - 180) < 1e-6) {
+            longitude = 180;
+        } else if (Math.abs(longitude + 180) < 1e-6) {
+            longitude = -180;
+        }
 
         return new double[]{latitude, longitude};
     }
