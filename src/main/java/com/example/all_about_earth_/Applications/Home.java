@@ -198,7 +198,7 @@ public class Home extends Application {
                 //Azione per il bottone Cronologia
                 history.setOnAction(event-> {
                     LocationsMenu locationsMenu = new LocationsMenu(homeStage);
-                    locationsMenu.start(stage);
+                    locationsMenu.start(new Stage());
                 });
 
                 isClicked = true;
