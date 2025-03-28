@@ -3,6 +3,7 @@ package com.example.all_about_earth_.Applications;
 import com.example.all_about_earth_.API.API;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
@@ -24,6 +25,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.security.SecureRandom;
@@ -76,6 +78,8 @@ public class Home extends Application {
     private Scene scene;
 
     private SecureRandom secureRandom = new SecureRandom();
+
+    private Group root = new Group();
 
     public Home(Stage stage){
         homeStage = stage;
@@ -170,7 +174,6 @@ public class Home extends Application {
         setButtonStyle();
 
         //Inserisco tutto nei bottoni
-        Group root = new Group();
         root.getChildren().add(world);
         root.getChildren().add(prepareImageView());
         root.getChildren().add(slider);
@@ -459,13 +462,48 @@ public class Home extends Application {
         api.setLatitude(latitude);
         api.setLongitude(longitude);
 
-        // Apri la finestra con i dati del luogo cliccato
-        Illustration illustration = new Illustration(api);
-        illustration.start(new Stage());
-        homeStage.close();
+        showLoading();
 
         // Ferma la rotazione della sfera
         isRotating = !isRotating;
+    }
+
+    public void showLoading(){
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setLayoutX(360);
+        progressIndicator.setLayoutY(100);
+
+        root.getChildren().add(progressIndicator);
+
+        // Avvia Illustration in un thread separato
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000); // Simula un breve caricamento
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            Platform.runLater(() -> {
+                root.getChildren().remove(progressIndicator);
+                new Illustration(api).start(new Stage()); // Avvia Illustration
+                homeStage.close();
+            });
+        }).start();
+    }
+
+    public void showLoadingAndStartIllustration(API api) {
+        Stage loadingStage = new Stage();
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+        loadingStage.setTitle("Caricamento...");
+
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        StackPane loadingPane = new StackPane(progressIndicator);
+        Scene loadingScene = new Scene(loadingPane, 150, 150);
+
+        loadingStage.setScene(loadingScene);
+        loadingStage.show();
+
+
     }
 
     private double[] sphereCoordinatesToGeographic(Point3D point) {
