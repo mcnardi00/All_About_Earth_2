@@ -83,7 +83,7 @@ public class Search extends Application {
 
         // Abilita il click del pulsante anche premendo la barra spaziatrice
         searchField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.SPACE) {
+            if (event.getCode() == KeyCode.ENTER) {
                 searchButton.fire();
             }
         });
@@ -122,7 +122,7 @@ public class Search extends Application {
         } else {
             // TODO: Aggiungere ulteriori condizioni per altre risoluzioni
             searchStage.setX(1300);
-            searchStage.setY(650);
+            searchStage.setY(630);
         }
 
         searchStage.show();
