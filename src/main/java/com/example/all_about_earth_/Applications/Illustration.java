@@ -4,13 +4,10 @@ import com.example.all_about_earth_.API.API;
 import com.example.all_about_earth_.Managers.ActualUserManager;
 import com.example.all_about_earth_.Managers.HistoryManager;
 import com.example.all_about_earth_.Object.Coordinate;
-import com.example.all_about_earth_.Object.Data;
-import com.example.all_about_earth_.Object.User;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -24,12 +21,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.Player;
 
 public class Illustration extends Application {
     private final Home home = new Home(new Stage());
@@ -68,11 +62,7 @@ public class Illustration extends Application {
     public void start(Stage stage) {
         // **Sfondo con immagine**
         Image backgroundImage = new Image("galaxy.jpg");
-        BackgroundImage background = new BackgroundImage(backgroundImage,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                new BackgroundSize(100, 100, true, true, true, true));
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, true, true));
         generalPane.setBackground(new Background(background));
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
@@ -91,16 +81,13 @@ public class Illustration extends Application {
         borderPane.setTop(titleBox);
 
         // **Testo descrittivo con box trasparente**
-        api.sendPrompt();
-
+        api.getPlaceNameFromCoordinates();
 
         String formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ","").trim();
         Label text = new Label(formattedText);
         System.out.println(formattedText);
         text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 18));
         text.setTextFill(Color.WHITE);
-        //text.setPadding(new Insets(25));
-        //text.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6); -fx-background-radius: 20px; -fx-border-color: white; -fx-border-width: 2px; -fx-alignment: center;");
         text.setWrapText(true);
 
         ScrollPane scrollPane = new ScrollPane(text);

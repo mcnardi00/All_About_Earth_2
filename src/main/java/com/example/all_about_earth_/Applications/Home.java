@@ -441,9 +441,9 @@ public class Home extends Application {
         double longitude = Math.toDegrees(Math.atan2(x, -z));
 
         if(latitude < 0){
-            latitude -= 15;
-        }else {
-            latitude += 15;
+            if (latitude - 15 > -90) {
+                latitude -= 15;
+            }
         }
 
         // Correzione per la longitudine a 180° esatta

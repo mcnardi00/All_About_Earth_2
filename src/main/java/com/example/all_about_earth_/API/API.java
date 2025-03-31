@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -42,82 +41,7 @@ public class API {
     public API() {}
 
     public void sendPrompt() {
-        if (place_name == null){
-            OkHttpClient httpClient = new OkHttpClient();
-            try {
-                JSONObject part = new JSONObject();
-                part.put("text", "Genera un testo informativo dettagliato sulla località geografica specificata, che può essere una città, un insediamento o un'area di interesse. Il testo deve seguire questo formato:\n" +
-                        "\n" +
-                        "[Nome della località], [Paese/Regione]\n" +
-                        "\n" +
-                        "Descrizione: Fornisci una descrizione concisa della località, evidenziando le sue caratteristiche geografiche, ambientali o culturali rilevanti. Se si tratta di un insediamento, descrivi il tipo di insediamento e le sue peculiarità.\n" +
-                        "Storia: Narra brevemente la storia della località, includendo la sua fondazione, eventi storici significativi o sviluppi chiave.\n" +
-                        "Curiosità: Presenta uno o due fatti interessanti, insoliti o unici sulla località, che possano catturare l'attenzione del lettore.\n" +
-                        "Utilizza le seguenti coordinate geografiche come riferimento per la località: " + latitude + ", " + longitude + ".\n" +
-                        "\n" +
-                        "Assicurati che il testo sia accurato, informativo e coinvolgente. Rispondi fornendo solo il testo informativo, senza preamboli o conclusioni aggiuntive.");
 
-                JSONArray partsArray = new JSONArray();
-                partsArray.put(part);
-
-                JSONObject content = new JSONObject();
-                content.put("parts", partsArray);
-
-                JSONArray contentsArray = new JSONArray();
-                contentsArray.put(content);
-
-                JSONObject requestBody = new JSONObject();
-                requestBody.put("contents", contentsArray);
-
-                RequestBody body = RequestBody.create(
-                        MediaType.get("application/json; charset=utf-8"),
-                        requestBody.toString()
-                );
-
-                Request request = new Request.Builder()
-                        .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY)
-                        .post(body)
-                        .build();
-
-                try (Response response = httpClient.newCall(request).execute()) {
-                    if (!response.isSuccessful()) {
-                        System.out.println("Errore nella richiesta: " + response.code());
-                        Error error = new Error("Errore nella richiesta");
-                        error.start(new Stage());
-                    }
-
-                    assert response.body() != null;
-                    String responseBody = response.body().string();
-                    JSONObject jsonResponse = new JSONObject(responseBody);
-
-                    //Parsing
-                    JSONArray candidates = jsonResponse.optJSONArray("candidates");
-                    if (candidates != null && !candidates.isEmpty()) {
-                        JSONObject firstCandidate = candidates.getJSONObject(0);
-                        JSONObject content0 = firstCandidate.getJSONObject("content");
-                        JSONArray parts = content0.getJSONArray("parts");
-                        if (!parts.isEmpty()) {
-                            JSONObject firstPart = parts.getJSONObject(0);
-                            String[] temp = firstPart.getString("text").split("\n", 2);
-                            place_name = temp[0];
-                            getPlaceId();
-                            writtenSpeech = temp[0] + temp[1];
-                            //getSpeech(); toDo
-                            return;
-                        }
-                    }
-                    Error error = new Error("Nessuna risposta disponibile.");
-                    error.start(new Stage());
-                }
-            }catch (Exception e) {
-                Error error = new Error("Nessuna risposta disponibile.");
-                try {
-                    error.start(new Stage());
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        }else{
             OkHttpClient httpClient = new OkHttpClient();
             try {
                 JSONObject part = new JSONObject();
@@ -190,8 +114,104 @@ public class API {
                     throw new RuntimeException(ex);
                 }
             }
-        }
+    }
+    public void getPlaceNameFromCoordinates() {
+        try {
+            String urlString = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + MAPS_API_KEY;
+            System.out.println(urlString);
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
 
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
+            JsonArray results = jsonObject.getAsJsonArray("results");
+
+            if (results.isEmpty()) {
+                place_name = "Luogo sconosciuto";
+                placeFound = false;
+                return;
+            }
+
+            // Estrai informazioni da tutti i risultati per trovare il miglior match
+            String cityName = null;
+            String subLocality = null;
+            String formattedAddress = null;
+
+            // Cerca attraverso i risultati per trovare il migliore per rappresentare la città
+            for (JsonElement result : results) {
+                JsonObject resultObj = result.getAsJsonObject();
+
+                // Salva il formatted_address dal primo risultato come fallback
+                if (formattedAddress == null) {
+                    formattedAddress = resultObj.get("formatted_address").getAsString();
+                }
+
+                JsonArray addressComponents = resultObj.getAsJsonArray("address_components");
+
+                // Cerca componenti specifici per la città
+                for (JsonElement component : addressComponents) {
+                    JsonObject componentObj = component.getAsJsonObject();
+                    JsonArray types = componentObj.getAsJsonArray("types");
+                    String longName = componentObj.get("long_name").getAsString();
+
+                    for (JsonElement type : types) {
+                        String typeStr = type.getAsString();
+
+                        // Priorità alla località (città)
+                        if (typeStr.equals("locality")) {
+                            cityName = longName;
+                        }
+                        // Se non troviamo una località, consideriamo un sotto-località
+                        else if (typeStr.equals("sublocality") || typeStr.equals("sublocality_level_1")) {
+                            subLocality = longName;
+                        }
+                        // Se non abbiamo trovato località o sotto-località, consideriamo l'area amministrativa
+                        else if (cityName == null && subLocality == null &&
+                                (typeStr.equals("administrative_area_level_3") ||
+                                        typeStr.equals("administrative_area_level_2"))) {
+                            cityName = longName;
+                        }
+                    }
+                }
+
+                // Se abbiamo trovato una città, usciamo dal ciclo
+                if (cityName != null) {
+                    break;
+                }
+            }
+
+            // Usa il formatted_address se non abbiamo trovato una città o sotto-località
+            if (cityName == null && subLocality == null) {
+                place_name = formattedAddress;
+            } else {
+                // Usa il nome della città se disponibile, altrimenti sotto-località
+                place_name = (cityName != null) ? cityName : subLocality;
+
+                // Aggiungi il paese se presente nel formatted_address
+                if (formattedAddress != null && formattedAddress.contains(", ")) {
+                    String country = formattedAddress.substring(formattedAddress.lastIndexOf(", ") + 2);
+                    place_name += ", " + country;
+                }
+            }
+
+            System.out.println("Luogo estratto: " + place_name);
+            sendPrompt();
+            placeFound = true;
+
+        } catch (Exception e) {
+            place_name = "Luogo sconosciuto";
+            placeFound = false;
+            System.err.println("Errore durante il recupero del nome del luogo: " + e.getMessage());
+        }
     }
 
     public void getCityByText(String text) {
