@@ -82,21 +82,25 @@ public class Illustration extends Application {
 
         String formattedText = "";
         if (api.getPlace_name() == null) {
-            try{
+            try {
                 // **Testo descrittivo con box trasparente**
                 boolean itWorks = api.getPlaceNameFromCoordinates();
 
                 //Se è un luogo sconosciuto
-                if(!itWorks){
+                if (!itWorks) {
                     stage.close();
                     home.start(new Stage());
                     return;
                 }
+                formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ", "").trim();
+
             } catch (Exception e) {
                 home.showLoading(true);
             }
+        } else if (api.getWrittenSpeech() == null){
+            api.sendPrompt();
+            formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ", "").trim();
         }
-        formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ", "").trim();
         Label text = new Label(formattedText);
         System.out.println(formattedText);
         text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 18));

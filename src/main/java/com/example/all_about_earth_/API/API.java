@@ -22,7 +22,7 @@ public class API {
 
     private final static String MAPS_API_KEY = "AIzaSyDA-cz4lKPKW4XS3iVHKX5qtStLBmsOw9w";
     private static final String GEMINI_API_KEY = "AIzaSyDGV9CmAf7cJDGs--3vpyecsgrMJLmVCEo";
-    private static final String ELEVENLABS_API_KEY = "sk_d0bca8b1b01bd9d8220e1f03cc85d0446591f3ee399d1a85";
+    private static final String ELEVENLABS_API_KEY = "sk_78eb8b220513365e4620fe5360f962aaeb2cbd2616b1a6ed";
     private double latitude, longitude;
     private String writtenSpeech;
     private ByteArrayInputStream spokenSpeech;
