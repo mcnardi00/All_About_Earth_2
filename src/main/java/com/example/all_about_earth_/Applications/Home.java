@@ -434,17 +434,36 @@ public class Home extends Application {
         double y = point.getY();
         double z = point.getZ();
 
-        // Calcolo della latitudine
-        double latitude = -Math.toDegrees(Math.asin(y / radius));
+        // Normalizza il punto sulla sfera
+        double length = Math.sqrt(x*x + y*y + z*z);
+        x = x / length * radius;
+        y = y / length * radius;
+        z = z / length * radius;
 
-        // Calcolo della longitudine
-        double longitude = Math.toDegrees(Math.atan2(x, -z));
+        double latitude = Math.toDegrees(Math.asin(-y / radius));
 
-        if(latitude < 0){
-            if (latitude - 15 > -90) {
-                latitude -= 15;
+        if (latitude < 0) {
+            if (latitude > -15) {
+                latitude -= 12;
+                if (latitude > -45) {
+                    latitude -= 5.5;
+                }
+                if (latitude - 12 < -90 && latitude > -75) {
+                    latitude -= 5.5;
+                }
+            }
+        } else if ( latitude > 15) {
+            latitude += 12;
+            if (latitude > 45) {
+                latitude += 5.5;
+            }
+            if (latitude + 12 < 90 && latitude > 75) {
+                latitude += 5.5;
             }
         }
+
+        // Calcola la longitudine
+        double longitude = Math.toDegrees(Math.atan2(x, -z));
 
         // Correzione per la longitudine a 180° esatta
         if (Math.abs(longitude - 180) < 1e-6) {
