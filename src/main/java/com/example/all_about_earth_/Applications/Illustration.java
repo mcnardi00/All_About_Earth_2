@@ -24,6 +24,10 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
+
+import java.io.InputStream;
 
 public class Illustration extends Application {
     private final Home home = new Home(new Stage());
@@ -39,7 +43,6 @@ public class Illustration extends Application {
     private final Slider audioSlider = new Slider();
 
     private final Button audioButton = new Button();
-
     private final Button getBackButton = new Button();
 
     private final ImageView imageView = new ImageView();
@@ -51,18 +54,22 @@ public class Illustration extends Application {
 
     private boolean ExceptionOpened = false;
 
+    // Variabili per la riproduzione audio
+    private Player player;
+    private boolean isPlaying = false;
 
-    public Illustration(API api){
+    public Illustration(API api) {
         this.api = api;
     }
 
-    public Illustration(){}
+    public Illustration() {}
 
     @Override
     public void start(Stage stage) {
         // **Sfondo con immagine**
         Image backgroundImage = new Image("galaxy.jpg");
-        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, true, true));
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, true, true));
         generalPane.setBackground(new Background(background));
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
@@ -85,22 +92,23 @@ public class Illustration extends Application {
             try {
                 // **Testo descrittivo con box trasparente**
                 boolean itWorks = api.getPlaceNameFromCoordinates();
-
-                //Se è un luogo sconosciuto
+                // Se è un luogo sconosciuto
                 if (!itWorks) {
                     stage.close();
                     home.start(new Stage());
                     return;
                 }
                 formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ", "").trim();
-
             } catch (Exception e) {
                 home.showLoading(true);
             }
-        } else if (api.getWrittenSpeech() == null){
+        } else if (api.getWrittenSpeech() == null) {
             api.sendPrompt();
             formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ", "").trim();
+        } else {
+            formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ", "").trim();
         }
+
         Label text = new Label(formattedText);
         System.out.println(formattedText);
         text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 18));
@@ -113,10 +121,10 @@ public class Illustration extends Application {
         scrollPane.setStyle("-fx-background: black");
         scrollPane.setPadding(new Insets(25));
 
-        if(screenHeight == 1080.0 && screenWidth == 1920.0){
+        if (screenHeight == 1080.0 && screenWidth == 1920.0) {
             scrollPane.setMaxWidth(800);
             scrollPane.setMaxHeight(700);
-        }else{
+        } else {
             scrollPane.setMaxWidth(600);
             scrollPane.setMaxHeight(500);
         }
@@ -124,7 +132,6 @@ public class Illustration extends Application {
         if (!api.isExceptionOpened()) {
             photoUrls = api.getPlacePhotos();
             boolean foundImage = false;
-
             for (String photoUrl : photoUrls) {
                 if (photoUrl != null) {
                     imageView.setImage(new Image(photoUrl));
@@ -132,7 +139,6 @@ public class Illustration extends Application {
                     break;
                 }
             }
-
             if (!foundImage) {
                 Label noImageLabel = new Label("Nessuna immagine disponibile");
                 noImageLabel.setFont(Font.font("Sans-serif", FontWeight.BOLD, 18));
@@ -148,23 +154,21 @@ public class Illustration extends Application {
             noImageLabel.setTextFill(Color.WHITE);
             imageAndText.getChildren().add(noImageLabel);
         }
-        
-        if(screenHeight == 1032.0 && screenWidth == 1920.0){
+
+        if (screenHeight == 1032.0 && screenWidth == 1920.0) {
             imageView.setFitWidth(1050);
             imageView.setFitHeight(700);
-        }else{
+        } else {
             imageView.setFitWidth(650);
             imageView.setFitHeight(500);
         }
-
         imageView.setStyle("-fx-padding: 3;");
 
-        //Contenitore immagine e testo
         imageAndText.getChildren().addAll(scrollPane);
         imageAndText.setAlignment(Pos.CENTER);
         borderPane.setCenter(imageAndText);
 
-        //Salvo su file
+        // Salvo su file
         Coordinate coordinate = new Coordinate(api.getWrittenSpeech(), api.getPlace_id(), api.getPlace_name());
         historyManager.AddNewPlace(coordinate);
 
@@ -173,54 +177,49 @@ public class Illustration extends Application {
         ImageView iconView = new ImageView(icon);
         iconView.setFitWidth(35);
         iconView.setFitHeight(35);
-
         audioButton.setGraphic(iconView);
         audioButton.setMinSize(70, 70);
 
         setAudioButtonStyle();
         setAudioSliderStyle();
 
-        //Box per audio in basso a destra
-        HBox audioBox = new HBox(10, audioSlider, audioButton);
+        //Box per audio
+        HBox audioBox = new HBox(10, audioButton);
         audioBox.setAlignment(Pos.CENTER_RIGHT);
         audioSlider.setVisible(false);
-        audioButton.setOnAction(e -> audioSlider.setVisible(!audioSlider.isVisible()));
 
-        /*
-        try {
-            Player player = new Player(api.getSpokenSpeech());
-            player.play();
-        } catch (JavaLayerException e) {
-            Error error = new Error("Problemi nella creazione del audio");
-            error.start(new Stage());
-        }
-
-         */
+        //Se l'audio è attivo lo toglie sennò lo avvia
+        audioButton.setOnAction(e -> {
+            if (isPlaying) {
+                stopAudio();
+            } else {
+                if (api.getSpokenSpeech() != null) {
+                    playAudio(api.getSpokenSpeech());
+                }
+            }
+        });
 
         //Bottone torna indietro
         Image getBack = new Image("back.png");
         ImageView getBackView = new ImageView(getBack);
         getBackView.setFitWidth(35);
         getBackView.setFitHeight(35);
-
         getBackButton.setGraphic(getBackView);
         getBackButton.setMinSize(70, 70);
-
-        getBackButton.setOnAction(e->{
+        getBackButton.setOnAction(e -> {
             home.start(new Stage());
+            stopAudio();
             stage.close();
-
         });
 
         setBackButtonStyle();
 
-        //Box per bottone torna indietro in basso a sinistra
+        //Box per bottone torna indietro
         HBox backBox = new HBox(getBackButton);
         backBox.setAlignment(Pos.CENTER_LEFT);
 
-        //Container inferiore
         BorderPane bottomLayout = new BorderPane();
-        bottomLayout.setPadding(new Insets(20)); // Padding uniforme
+        bottomLayout.setPadding(new Insets(20));
         bottomLayout.setLeft(backBox);
         bottomLayout.setRight(audioBox);
 
@@ -232,12 +231,47 @@ public class Illustration extends Application {
         stage.setTitle("All About Earth 🌍");
         stage.setMaximized(true);
         stage.show();
+
+        //Avvia la slideshow delle immagini
         startImageSlideshow();
+
+        //Avvia automaticamente l'audio
+        if (api.getSpokenSpeech() != null && !isPlaying) {
+            playAudio(api.getSpokenSpeech());
+        }
     }
 
-    //Fornisce stile allo slider
+    private void playAudio(InputStream audioStream) {
+        System.out.println("playAudio() è stato chiamato");
+        try {
+            System.out.println("Byte disponibili: " + audioStream.available());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        Thread audioThread = new Thread(() -> {
+            try {
+                player = new Player(audioStream);
+                isPlaying = true;
+                player.play();
+            } catch (JavaLayerException e) {
+                e.printStackTrace();
+            } finally {
+                isPlaying = false;
+            }
+        });
+        audioThread.start();
+    }
+
+
+    private void stopAudio() {
+        if (player != null) {
+            player.close();
+            isPlaying = false;
+        }
+    }
+
+    // Fornisce stile allo slider
     public void setAudioSliderStyle() {
-        // **Slider audio inizialmente nascosto**
         audioSlider.setMax(10);
         audioSlider.setMin(0);
         audioSlider.setPrefWidth(30);
@@ -248,8 +282,8 @@ public class Illustration extends Application {
         audioSlider.setVisible(false);
     }
 
-    //Fornisce stile al bottone dell'audio
-    public void setAudioButtonStyle(){
+    // Fornisce stile al bottone dell'audio
+    public void setAudioButtonStyle() {
         audioButton.setStyle(
                 "-fx-background-color: linear-gradient(to bottom, #ff8c00, #ff4500); " +
                         "-fx-background-radius: 50px; " +
@@ -274,24 +308,22 @@ public class Illustration extends Application {
         audioButton.setEffect(new DropShadow(15, Color.BLACK));
     }
 
-    //Fornisce lo stile al bottone per tornare indietro
+    // Fornisce lo stile al bottone per tornare indietro
     public void setBackButtonStyle() {
         getBackButton.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #0077b6, #023e8a); " + // Blu elegante
+                "-fx-background-color: linear-gradient(to bottom, #0077b6, #023e8a); " +
                         "-fx-background-radius: 50px; " +
                         "-fx-border-color: white; " +
                         "-fx-border-width: 3px; " +
                         "-fx-border-radius: 50px;"
         );
-
         getBackButton.setOnMouseEntered(e -> getBackButton.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #023e8a, #0077b6); " + // Inversione del gradiente
+                "-fx-background-color: linear-gradient(to bottom, #023e8a, #0077b6); " +
                         "-fx-background-radius: 50px; " +
                         "-fx-border-color: white; " +
                         "-fx-border-width: 3px; " +
                         "-fx-border-radius: 50px;"
         ));
-
         getBackButton.setOnMouseExited(e -> getBackButton.setStyle(
                 "-fx-background-color: linear-gradient(to bottom, #0077b6, #023e8a); " +
                         "-fx-background-radius: 50px; " +
@@ -299,8 +331,7 @@ public class Illustration extends Application {
                         "-fx-border-width: 3px; " +
                         "-fx-border-radius: 50px;"
         ));
-
-        getBackButton.setEffect(new DropShadow(15, Color.BLACK)); // Ombra elegante
+        getBackButton.setEffect(new DropShadow(15, Color.BLACK));
     }
 
     private void startImageSlideshow() {
@@ -312,7 +343,7 @@ public class Illustration extends Application {
                     } else {
                         currentImageIndex = (currentImageIndex + 1) % photoUrls.length;
                     }
-                    if (photoUrls[currentImageIndex] != null){
+                    if (photoUrls[currentImageIndex] != null) {
                         Image newImage = new Image(photoUrls[currentImageIndex]);
                         imageView.setImage(newImage);
                     }
@@ -327,4 +358,3 @@ public class Illustration extends Application {
         launch(args);
     }
 }
-
