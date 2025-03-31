@@ -322,39 +322,6 @@ public class Home extends Application {
         return sphere;
     }
 
-    private Image shiftImageHorizontally(Image image, int shift) {
-        int width = (int) image.getWidth();
-        int height = (int) image.getHeight();
-
-        WritableImage shiftedImage = new WritableImage(width, height);
-        PixelReader reader = image.getPixelReader();
-        PixelWriter writer = shiftedImage.getPixelWriter();
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int newX = (x + shift) % width; // Scorrimento ciclico
-                writer.setArgb(x, y, reader.getArgb(newX, y));
-            }
-        }
-
-        return shiftedImage;
-    }
-
-    private void printCenterPixels(Image image) {
-        PixelReader reader = image.getPixelReader();
-        int width = (int) image.getWidth();
-        int height = (int) image.getHeight();
-
-        int y = height / 2; // Riga centrale
-
-        System.out.println("Pixel al centro della texture:");
-        for (int x = 0; x < width; x += width / 10) { // Stampiamo ogni 10% dell'immagine
-            int argb = reader.getArgb(x, y);
-            Color color = Color.rgb((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF);
-            System.out.println("x = " + x + ", Colore = " + color);
-        }
-    }
-
     //Gestisce il mouse e la rotazione
     private void initMouseControl(Group group, Scene scene, Stage stage) {
         Rotate xRotate;
@@ -472,6 +439,12 @@ public class Home extends Application {
 
         // Calcolo della longitudine
         double longitude = Math.toDegrees(Math.atan2(x, -z));
+
+        if(latitude < 0){
+            latitude -= 15;
+        }else {
+            latitude += 15;
+        }
 
         // Correzione per la longitudine a 180° esatta
         if (Math.abs(longitude - 180) < 1e-6) {
