@@ -24,6 +24,8 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 
 public class Illustration extends Application {
     private final Home home = new Home(new Stage());
@@ -107,8 +109,6 @@ public class Illustration extends Application {
         if(!api.isExceptionOpened()){
             photoUrls = api.getPlacePhotos();
 
-            //Todo:risolvere bug ogni tanto exception
-
             for (String photoUrl : photoUrls){
                 if(photoUrl != null){
                     imageView.setImage(new Image(photoUrl));
@@ -154,14 +154,13 @@ public class Illustration extends Application {
         audioSlider.setVisible(false);
         audioButton.setOnAction(e -> audioSlider.setVisible(!audioSlider.isVisible()));
 
-        /* toDo riproduzione audio
-        Player player = null;
         try {
-            player = new Player(api.getSpokenSpeech());
+            Player player = new Player(api.getSpokenSpeech());
             player.play();
         } catch (JavaLayerException e) {
-            throw new RuntimeException(e);
-        }*/
+            Error error = new Error("Problemi nella creazione del audio");
+            error.start(new Stage());
+        }
 
         //Bottone torna indietro
         Image getBack = new Image("back.png");

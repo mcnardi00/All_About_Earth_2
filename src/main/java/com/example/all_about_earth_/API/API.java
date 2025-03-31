@@ -22,7 +22,7 @@ public class API {
 
     private final static String MAPS_API_KEY = "AIzaSyDA-cz4lKPKW4XS3iVHKX5qtStLBmsOw9w";
     private static final String GEMINI_API_KEY = "AIzaSyDGV9CmAf7cJDGs--3vpyecsgrMJLmVCEo";
-    private static final String ELEVENLABS_API_KEY = "sk_fd88bccbb515b640bf2f127b79007200fecefe7930644d3e";// toDo controllare la API key prima di consegnare
+    private static final String ELEVENLABS_API_KEY = "sk_e055eb273ff8a16caf5e66344f2ed374c3e16f444d33129a";
     private double latitude, longitude;
     private String writtenSpeech;
     private ByteArrayInputStream spokenSpeech;
@@ -99,7 +99,7 @@ public class API {
                             JSONObject firstPart = parts.getJSONObject(0);
                             getPlaceId();
                             writtenSpeech = firstPart.getString("text");
-                            //getSpeech(); toDo
+                            getSpeech();
                             return;
                         }
                     }
