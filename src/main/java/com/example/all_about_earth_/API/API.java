@@ -175,9 +175,7 @@ public class API {
                             subLocality = longName;
                         }
                         // Se non abbiamo trovato località o sotto-località, consideriamo l'area amministrativa
-                        else if (cityName == null && subLocality == null &&
-                                (typeStr.equals("administrative_area_level_3") ||
-                                        typeStr.equals("administrative_area_level_2"))) {
+                        else if (cityName == null && subLocality == null && (typeStr.equals("administrative_area_level_3") || typeStr.equals("administrative_area_level_2"))) {
                             cityName = longName;
                         }
                     }
@@ -192,25 +190,32 @@ public class API {
             // Usa il formatted_address se non abbiamo trovato una città o sotto-località
             if (cityName == null && subLocality == null) {
                 place_name = formattedAddress;
+                getPlaceId();
             } else {
                 // Usa il nome della città se disponibile, altrimenti sotto-località
                 place_name = (cityName != null) ? cityName : subLocality;
-
                 // Aggiungi il paese se presente nel formatted_address
                 if (formattedAddress != null && formattedAddress.contains(", ")) {
                     String country = formattedAddress.substring(formattedAddress.lastIndexOf(", ") + 2);
                     place_name += ", " + country;
                 }
+                getPlaceId();
             }
 
             System.out.println("Luogo estratto: " + place_name);
+            if (place_name.contains("+")){
+                Error error = new Error("Hai selezionato un luogo non disponibile");
+                error.start(new Stage());
+                return;
+            }
             sendPrompt();
             placeFound = true;
 
         } catch (Exception e) {
             place_name = "Luogo sconosciuto";
             placeFound = false;
-            System.err.println("Errore durante il recupero del nome del luogo: " + e.getMessage());
+            Error error = new Error("Errore durante il recupero del nome del luogo: " + e.getMessage());
+            error.start(new Stage());
         }
     }
 
@@ -218,8 +223,7 @@ public class API {
         placeFound = true;
 
         try {
-            String urlString = "https://maps.googleapis.com/maps/api/geocode/json?address="
-                    + URLEncoder.encode(text, "UTF-8") + "&key=" + MAPS_API_KEY;
+            String urlString = "https://maps.googleapis.com/maps/api/geocode/json?address=" + URLEncoder.encode(text, "UTF-8") + "&key=" + MAPS_API_KEY;
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
@@ -275,7 +279,6 @@ public class API {
             }
         }
     }
-
 
     public void getSpeech() {
 
