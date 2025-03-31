@@ -225,7 +225,6 @@ public class API {
 
     public void getCityByText(String text) {
         placeFound = true;
-
         try {
             String urlString = "https://maps.googleapis.com/maps/api/geocode/json?address=" + URLEncoder.encode(text, "UTF-8") + "&key=" + MAPS_API_KEY;
             URL url = new URL(urlString);
@@ -243,8 +242,9 @@ public class API {
             JsonObject jsonObject = JsonParser.parseString(response.toString()).getAsJsonObject();
             JsonArray results = jsonObject.getAsJsonArray("results");
 
-            if (results.size() == 0) {
-                throw new Exception("Nessun risultato trovato per: " + text);
+            if (results.isEmpty()) {
+                Error error = new Error("Nessun risultato trovato per: " + text);
+                error.start(new Stage());
             }
 
             JsonObject firstResult = results.get(0).getAsJsonObject();
