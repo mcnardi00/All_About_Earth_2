@@ -24,8 +24,6 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.Player;
 
 public class Illustration extends Application {
     private final Home home = new Home(new Stage());
@@ -82,10 +80,23 @@ public class Illustration extends Application {
         titleBox.setPadding(new Insets(30, 0, 30, 0));
         borderPane.setTop(titleBox);
 
-        // **Testo descrittivo con box trasparente**
-        api.getPlaceNameFromCoordinates();
+        String formattedText = "";
+        try{
+            // **Testo descrittivo con box trasparente**
+            boolean itWorks = api.getPlaceNameFromCoordinates();
 
-        String formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ","").trim();
+            //Se è un luogo sconosciuto
+            if(!itWorks){
+                stage.close();
+                home.start(new Stage());
+                return;
+            }
+
+            formattedText = api.getWrittenSpeech().replace("**", "").replace("*  ","").trim();
+        } catch (Exception e) {
+            home.showLoading(true);
+        }
+
         Label text = new Label(formattedText);
         System.out.println(formattedText);
         text.setFont(Font.font("Sans-serif", FontWeight.MEDIUM, 18));
@@ -106,15 +117,32 @@ public class Illustration extends Application {
             scrollPane.setMaxHeight(500);
         }
 
-        if(!api.isExceptionOpened()){
+        if (!api.isExceptionOpened()) {
             photoUrls = api.getPlacePhotos();
+            boolean foundImage = false;
 
-            for (String photoUrl : photoUrls){
-                if(photoUrl != null){
+            for (String photoUrl : photoUrls) {
+                if (photoUrl != null) {
                     imageView.setImage(new Image(photoUrl));
+                    foundImage = true;
                     break;
                 }
             }
+
+            if (!foundImage) {
+                Label noImageLabel = new Label("Nessuna immagine disponibile");
+                noImageLabel.setFont(Font.font("Sans-serif", FontWeight.BOLD, 18));
+                noImageLabel.setTextFill(Color.WHITE);
+                noImageLabel.setAlignment(Pos.CENTER);
+                imageAndText.getChildren().add(noImageLabel);
+            } else {
+                imageAndText.getChildren().add(imageView);
+            }
+        } else {
+            Label noImageLabel = new Label("Nessuna immagine disponibile");
+            noImageLabel.setFont(Font.font("Sans-serif", FontWeight.BOLD, 18));
+            noImageLabel.setTextFill(Color.WHITE);
+            imageAndText.getChildren().add(noImageLabel);
         }
         
         if(screenHeight == 1032.0 && screenWidth == 1920.0){
@@ -128,7 +156,7 @@ public class Illustration extends Application {
         imageView.setStyle("-fx-padding: 3;");
 
         //Contenitore immagine e testo
-        imageAndText.getChildren().addAll(imageView, scrollPane);
+        imageAndText.getChildren().addAll(scrollPane);
         imageAndText.setAlignment(Pos.CENTER);
         borderPane.setCenter(imageAndText);
 
@@ -154,6 +182,7 @@ public class Illustration extends Application {
         audioSlider.setVisible(false);
         audioButton.setOnAction(e -> audioSlider.setVisible(!audioSlider.isVisible()));
 
+        /*
         try {
             Player player = new Player(api.getSpokenSpeech());
             player.play();
@@ -161,6 +190,8 @@ public class Illustration extends Application {
             Error error = new Error("Problemi nella creazione del audio");
             error.start(new Stage());
         }
+
+         */
 
         //Bottone torna indietro
         Image getBack = new Image("back.png");

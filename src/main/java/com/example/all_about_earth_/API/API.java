@@ -22,7 +22,7 @@ public class API {
 
     private final static String MAPS_API_KEY = "AIzaSyDA-cz4lKPKW4XS3iVHKX5qtStLBmsOw9w";
     private static final String GEMINI_API_KEY = "AIzaSyDGV9CmAf7cJDGs--3vpyecsgrMJLmVCEo";
-    private static final String ELEVENLABS_API_KEY = "sk_e055eb273ff8a16caf5e66344f2ed374c3e16f444d33129a";
+    private static final String ELEVENLABS_API_KEY = "sk_d0bca8b1b01bd9d8220e1f03cc85d0446591f3ee399d1a85";
     private double latitude, longitude;
     private String writtenSpeech;
     private ByteArrayInputStream spokenSpeech;
@@ -115,7 +115,9 @@ public class API {
                 }
             }
     }
-    public void getPlaceNameFromCoordinates() {
+
+    //Se è un luogo sconosciuto ritorna false
+    public boolean getPlaceNameFromCoordinates() {
         try {
             String urlString = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + MAPS_API_KEY;
             System.out.println(urlString);
@@ -138,7 +140,7 @@ public class API {
             if (results.isEmpty()) {
                 place_name = "Luogo sconosciuto";
                 placeFound = false;
-                return;
+                return false;
             }
 
             // Estrai informazioni da tutti i risultati per trovare il miglior match
@@ -206,10 +208,11 @@ public class API {
             if (place_name.contains("+")){
                 Error error = new Error("Hai selezionato un luogo non disponibile");
                 error.start(new Stage());
-                return;
+                return false;
             }
             sendPrompt();
             placeFound = true;
+            return true;
 
         } catch (Exception e) {
             place_name = "Luogo sconosciuto";
@@ -217,6 +220,7 @@ public class API {
             Error error = new Error("Errore durante il recupero del nome del luogo: " + e.getMessage());
             error.start(new Stage());
         }
+        return false;
     }
 
     public void getCityByText(String text) {
@@ -366,6 +370,7 @@ public class API {
                     exceptionOpened = true;
                     System.out.println(isExceptionOpened());
                     error.start(new Stage());
+
                 }
             } else {
                 Error error = new Error("Nessuna foto trovata.");

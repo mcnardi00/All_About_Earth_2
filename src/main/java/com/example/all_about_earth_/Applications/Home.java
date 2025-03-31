@@ -124,7 +124,7 @@ public class Home extends Application {
             api.setLongitude(longitudine);
             api.setLongitude(latitudine);
 
-            showLoading();
+            showLoading(false);
         });
 
 
@@ -393,18 +393,23 @@ public class Home extends Application {
         api.setLatitude(latitude);
         api.setLongitude(longitude);
 
-        showLoading();
+        showLoading(false);
 
         //Ferma la rotazione della sfera
         isRotating = !isRotating;
     }
 
-    public void showLoading(){
+    public void showLoading(boolean isAlreadyOpened){
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setStyle("-fx-progress-color: white;");
         progressIndicator.setLayoutX(380);
         progressIndicator.setLayoutY(100);
-        root.getChildren().add(progressIndicator);
+
+        if(isAlreadyOpened){
+            root.getChildren().remove(progressIndicator);
+        }else{
+            root.getChildren().add(progressIndicator);
+        }
 
         isRotating = true;
 
@@ -419,7 +424,7 @@ public class Home extends Application {
             Platform.runLater(() -> {
                 //Crea e avvia Illustration in una nuova finestra
                 Stage illustrationStage = new Stage();
-                illustrationStage.initModality(Modality.NONE);
+                //illustrationStage.initModality(Modality.NONE);
                 Illustration illustration = new Illustration(api);
                 illustration.start(illustrationStage);
                 homeStage.close();
