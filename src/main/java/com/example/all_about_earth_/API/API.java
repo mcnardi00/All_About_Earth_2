@@ -20,9 +20,11 @@ import java.nio.charset.StandardCharsets;
 
 public class API {
 
-    private final static String MAPS_API_KEY = "AIzaSyDA-cz4lKPKW4XS3iVHKX5qtStLBmsOw9w";
-    private static final String GEMINI_API_KEY = "AIzaSyDGV9CmAf7cJDGs--3vpyecsgrMJLmVCEo";
-    private static final String ELEVENLABS_API_KEY = "sk_3067f4e6ccb519052e91fedf7769a3d37eee37606ddbb5ec";
+    //Todo:you need to create your api key
+    private final static String MAPS_API_KEY = "your_api_key";
+    private static final String GEMINI_API_KEY = "your_api_key";
+    private static final String ELEVENLABS_API_KEY = "your_api_key";
+    
     private double latitude, longitude;
     private String writtenSpeech;
     private ByteArrayInputStream spokenSpeech;
